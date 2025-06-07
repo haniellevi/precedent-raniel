@@ -2,10 +2,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import { Label } from '@/components/components/ui/label';
+import { Input } from '@/components/components/ui/input';
+import { Textarea } from '@/components/components/ui/textarea';
+import { Button } from '@/components/components/ui/button';
 import { Upload, Youtube, User } from 'lucide-react';
 
 // Este é um Client Component, pois lida com estado e interações do usuário.

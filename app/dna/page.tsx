@@ -3,7 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 // Componentes da UI - Estes componentes vêm do template Precedent (shadcn/ui)
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/components/ui/card";
+import DnaForm from "./dna-form";
 
 // Esta página é um Server Component, o que é ótimo para performance.
 // Ela será renderizada no servidor.
@@ -43,16 +44,7 @@ export default async function DnaPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* PRÓXIMO PASSO:
-              Aqui vamos inserir um Client Component ('use client') 
-              para o formulário interativo de upload e submissão.
-              Por enquanto, é apenas um placeholder.
-            */}
-            <div className="p-8 border-2 border-dashed rounded-lg text-center">
-              <p className="text-muted-foreground">
-                [Formulário de Upload do DNA em breve...]
-              </p>
-            </div>
+            <DnaForm />
           </CardContent>
         </Card>
 
