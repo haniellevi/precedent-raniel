@@ -1,0 +1,56 @@
+opie e cole o texto abaixo no chat do assistente do Replit.
+
+Olá! O formulário na página /dna ainda não está a aparecer. O problema parece ser um caminho de importação incorreto. Por favor, execute a seguinte tarefa.
+
+Tarefa: Corrigir o caminho de importação na página de DNA
+
+Abra o ficheiro que está em app/dna/page.tsx e substitua todo o seu conteúdo pelo código corrigido abaixo. A única alteração é na linha de importação do DnaForm.
+
+// Caminho do ficheiro: app/dna/page.tsx
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+// AQUI ESTÁ A CORREÇÃO: O caminho correto para o formulário
+import DnaForm from "@/components/dna-form";
+
+export default async function DnaPage() {
+  console.log("--- INÍCIO: A renderizar a página /dna no servidor ---");
+
+  const { userId } = auth();
+  console.log("Resultado da chamada a auth():", { userId: userId });
+
+  if (!userId) {
+    console.log("CONFIRMAÇÃO: O userId é nulo. A redirecionar para /sign-in...");
+    return redirect("/sign-in");
+  }
+
+  console.log(`SUCESSO: Utilizador autenticado com o ID: ${userId}. A renderizar o conteúdo da página.`);
+
+  return (
+    <div className="flex min-h-screen w-full flex-col items-center bg-muted/40 p-4 sm:p-6 md:p-10">
+      <main className="flex-1 w-full max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">
+            Gerir o Meu DNA de Pregador
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Aqui pode definir o seu estilo único de pregação para que a IA gere sermões com a sua voz.
+          </p>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>O seu DNA Personalizado</CardTitle>
+            <CardDescription>
+              Forneça as suas referências para que a IA possa aprender o seu estilo.
+              Este processo só precisa de ser feito uma vez.
+            </CardDescription>
+          </Header>
+          <CardContent>
+            <DnaForm />
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}
