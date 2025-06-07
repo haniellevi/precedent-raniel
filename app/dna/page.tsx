@@ -1,7 +1,8 @@
+// Caminho do ficheiro: app/dna/page.tsx
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/components/ui/card";
-import DnaForm from "./dna-form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import DnaForm from "@/components/dna-form";
 
 export default async function DnaPage() {
   const { userId } = auth();
@@ -14,18 +15,18 @@ export default async function DnaPage() {
       <main className="flex-1 w-full max-w-4xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">
-            Gerenciar Meu DNA de Pregador
+            Gerir o Meu DNA de Pregador
           </h1>
           <p className="text-muted-foreground mt-1">
-            Aqui você pode definir seu estilo único de pregação para que a IA gere sermões com a sua voz.
+            Aqui pode definir o seu estilo único de pregação para que a IA gere sermões com a sua voz.
           </p>
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>Seu DNA Customizado</CardTitle>
+            <CardTitle>O seu DNA Personalizado</CardTitle>
             <CardDescription>
-              Forneça suas referências para que a IA possa aprender seu estilo.
-              Este processo só precisa ser feito uma vez.
+              Forneça as suas referências para que a IA possa aprender o seu estilo.
+              Este processo só precisa de ser feito uma vez.
             </CardDescription>
           </CardHeader>
           <CardContent>
