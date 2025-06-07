@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, Mic, FileText, Zap } from "lucide-react";
+import { Mic, FileText, Zap } from "lucide-react";
 
 export default function Home() {
   return (
@@ -43,7 +43,7 @@ export default function Home() {
           <Card className="text-center hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="mx-auto w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Brain className="h-6 w-6 text-blue-600" />
+                <Mic className="h-6 w-6 text-blue-600" />
               </div>
               <CardTitle>1. Defina o seu DNA</CardTitle>
             </CardHeader>
