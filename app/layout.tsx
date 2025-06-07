@@ -1,13 +1,16 @@
-import cx from "classnames";
-import { sfPro, inter } from "./fonts";
-import "./globals.css";
-import { ClerkProvider } from '@clerk/nextjs'
+
+import "@/app/globals.css";
+import { inter } from "@/app/fonts";
+import { Analytics } from "@vercel/analytics/react";
+import { Metadata } from "next";
+import { cn } from "@/lib/utils";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Suspense } from "react";
 import NavBar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Precedent - Building blocks for your Next.js project",
   description:
     "Precedent is the all-in-one solution for your Next.js project. It includes a design system, authentication, analytics, and more.",
@@ -15,21 +18,22 @@ export const metadata = {
   themeColor: "#FFF",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={cx(sfPro.variable, inter.variable)}>
+      <html lang="en" suppressHydrationWarning>
+        <body className={cn(inter.variable, "bg-gray-50")}>
           <div className="fixed h-screen w-full bg-gradient-to-br from-indigo-50 via-white to-cyan-100" />
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<div>A carregar...</div>}>
             <NavBar />
           </Suspense>
-          <main className="relative z-10">{children}</main>
+          <main>{children}</main>
           <Footer />
+          <Analytics />
           <Sonner />
         </body>
       </html>

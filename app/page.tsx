@@ -1,3 +1,4 @@
+
 import Card from "@/components/home/card";
 import { DEPLOY_URL } from "@/lib/constants";
 import { Github, Twitter } from "@/components/shared/icons";
@@ -16,15 +17,71 @@ export default async function Home() {
           "Content-Type": "application/json",
         },
       }),
-      // data will revalidate every 24 hours
       next: { revalidate: 86400 },
-    },
+    }
   )
     .then((res) => res.json())
     .catch((e) => console.log(e));
 
+  const features = [
+    {
+      title: "Beautiful, reusable components",
+      description:
+        "Pre-built beautiful, a11y-first components, powered by [Tailwind CSS](https://tailwindcss.com/), [Radix UI](https://www.radix-ui.com/), and [Framer Motion](https://framer.com/motion)",
+      demo: <ComponentGrid />,
+      large: true,
+    },
+    {
+      title: "Performance first",
+      description:
+        "Built on [Next.js](https://nextjs.org/) primitives like `@next/font` and `next/image` for stellar performance.",
+      demo: <WebVitals />,
+    },
+    {
+      title: "One-click Deploy",
+      description:
+        "Jumpstart your next project by deploying Precedent to [Vercel](https://vercel.com/) in one click.",
+      demo: (
+        <a href={DEPLOY_URL} target="_blank" rel="noopener noreferrer">
+          <Image
+            src="https://vercel.com/button"
+            alt="Deploy with Vercel"
+            width={120}
+            height={30}
+            unoptimized
+          />
+        </a>
+      ),
+    },
+    {
+      title: "Built-in Authentication",
+      description:
+        "Precedent comes with authentication and user management built-in with [Clerk](https://clerk.dev/).",
+      demo: (
+        <div className="flex items-center justify-center space-x-20">
+          <Image alt="Auth" src="/clerk.svg" width={50} height={50} />
+        </div>
+      ),
+    },
+    {
+      title: "Hooks, utilities, and more",
+      description:
+        "Precedent includes a collection of hooks, utilities, and components to help you build your next project.",
+      demo: (
+        <div className="grid grid-cols-3 gap-4 w-full">
+          <div className="bg-gray-100 h-20 rounded-md" />
+          <div className="bg-gray-100 h-20 rounded-md" />
+          <div className="bg-gray-100 h-20 rounded-md" />
+          <div className="bg-gray-100 h-20 rounded-md" />
+          <div className="bg-gray-100 h-20 rounded-md" />
+          <div className="bg-gray-100 h-20 rounded-md" />
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <>
+    <div className="flex min-h-screen w-full flex-col items-center justify-center py-32">
       <div className="z-10 w-full max-w-xl px-5 xl:px-0">
         <a
           href="https://twitter.com/steventey/status/1613928948915920896"
@@ -107,62 +164,6 @@ export default async function Home() {
           />
         ))}
       </div>
-    </>
+    </div>
   );
 }
-
-const features = [
-  {
-    title: "Beautiful, reusable components",
-    description:
-      "Pre-built beautiful, a11y-first components, powered by [Tailwind CSS](https://tailwindcss.com), [Radix UI](https://www.radix-ui.com), and [Framer Motion](https://framer.com/motion). Used in production on [Dub.co](https://dub.co).",
-    large: true,
-  },
-  {
-    title: "Performance first",
-    description:
-      "Built on [Next.js](https://nextjs.org/) primitives like `@next/font` and `next/image` for stellar performance.",
-    demo: <WebVitals />,
-  },
-  {
-    title: "One-click Deploy",
-    description:
-      "Jumpstart your next project by deploying Precedent to [Vercel](https://vercel.com/) in one click.",
-    demo: (
-      <a href={DEPLOY_URL}>
-        <Image
-          src="https://vercel.com/button"
-          alt="Deploy with Vercel"
-          width={120}
-          height={30}
-          unoptimized
-        />
-      </a>
-    ),
-  },
-  {
-    title: "Built-in Auth",
-    description:
-      "Precedent comes with authentication via [Clerk](https://clerk.com/)",
-    demo: (
-      <div className="flex items-center justify-center space-x-20">
-        <Image alt="Clerk logo" src="/clerk.svg" width={50} height={50} />
-      </div>
-    ),
-  },
-  {
-    title: "Hooks, utilities, and more",
-    description:
-      "Precedent offers a collection of hooks, utilities, and `@vercel/og`",
-    demo: (
-      <div className="grid grid-flow-col grid-rows-3 gap-10 p-10">
-        <span className="font-mono font-semibold">useIntersectionObserver</span>
-        <span className="font-mono font-semibold">useLocalStorage</span>
-        <span className="font-mono font-semibold">useScroll</span>
-        <span className="font-mono font-semibold">nFormatter</span>
-        <span className="font-mono font-semibold">capitalize</span>
-        <span className="font-mono font-semibold">truncate</span>
-      </div>
-    ),
-  },
-];
