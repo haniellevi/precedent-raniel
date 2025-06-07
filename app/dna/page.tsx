@@ -1,8 +1,10 @@
+
 // Caminho do ficheiro: app/dna/page.tsx
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import DnaForm from "@/components/dna-form";
+// O caminho foi corrigido para um import relativo, pois o DnaForm está na mesma pasta.
+import DnaForm from "./dna-form";
 
 export default async function DnaPage() {
   const { userId } = auth();
