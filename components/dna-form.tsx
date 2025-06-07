@@ -1,104 +1,104 @@
 
 'use client';
 
-import { useState, useTransition } from 'react';
-import { Label } from '@/components/components/ui/label';
-import { Input } from '@/components/components/ui/input';
-import { Textarea } from '@/components/components/ui/textarea';
-import { Button } from '@/components/components/ui/button';
+import { useState } from 'react';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Upload, Youtube, User } from 'lucide-react';
 
-// Importa a nossa Server Action
-import { processDnaData } from '@/app/actions/dnaActions';
-
-// Este é um Client Component, pois lida com estado e interações do utilizador.
+// Este é um Client Component, pois lida com estado e interações do usuário.
 export default function DnaForm() {
-  const [isPending, startTransition] = useTransition();
+  // Estados para controlar os valores dos campos do formulário
+  const [youtubeLink, setYoutubeLink] = useState('');
+  const [personalDescription, setPersonalDescription] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setFile(event.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
-    // Cria um objeto FormData diretamente a partir do formulário.
-    // É uma forma moderna e eficiente de obter todos os dados.
-    const formData = new FormData(event.currentTarget);
+    setIsLoading(true);
 
-    // Usa startTransition para envolver a chamada da Server Action.
-    // Isso mantém a UI interativa enquanto a ação está a ser processada no servidor.
-    startTransition(async () => {
-      const result = await processDnaData(formData);
-      
-      if (result?.errors) {
-        // Futuramente, aqui mostraremos os erros de validação na UI
-        console.error("Erros de validação:", result.errors);
-        alert("Ocorreram erros de validação. Verifique a consola.");
-      } else {
-        // Futuramente, aqui mostraremos uma mensagem de sucesso (toast)
-        console.log("Sucesso:", result?.message);
-        alert("Dados do DNA enviados para processamento!");
-      }
+    // Futuramente, aqui chamaremos uma Server Action para processar os dados.
+    console.log({
+      youtubeLink,
+      personalDescription,
+      fileName: file?.name,
     });
+
+    // Simula uma chamada de API
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Lógica para lidar com a resposta (sucesso ou erro)
+    
+    setIsLoading(false);
   };
 
   return (
-    // Ligamos o nosso handler `handleSubmit` ao evento `onSubmit` do formulário
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Adicionamos o atributo `name` a cada campo do formulário.
-        Isto é essencial para que o FormData consiga capturar os seus valores.
-      */}
       <div className="space-y-2">
         <Label htmlFor="youtube-link" className="flex items-center gap-2">
           <Youtube className="h-5 w-5" />
           Link de Vídeo do YouTube
         </Label>
         <p className="text-sm text-muted-foreground">
-          Cole o URL de um sermão seu no YouTube para analisarmos a sua fala.
+          Cole a URL de um sermão seu no YouTube para analisarmos sua fala.
         </p>
         <Input
           id="youtube-link"
-          name="youtubeLink" // Atributo `name` adicionado
           type="url"
           placeholder="https://www.youtube.com/watch?v=..."
-          disabled={isPending}
+          value={youtubeLink}
+          onChange={(e) => setYoutubeLink(e.target.value)}
+          disabled={isLoading}
         />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="personal-description" className="flex items-center gap-2">
           <User className="h-5 w-5" />
-          Como se vê como pregador?
+          Como você se vê como pregador?
         </Label>
         <p className="text-sm text-muted-foreground">
-          Descreva o seu estilo, tom e os temas que mais gosta de abordar.
+          Descreva seu estilo, tom e os temas que mais gosta de abordar.
         </p>
         <Textarea
           id="personal-description"
-          name="personalDescription" // Atributo `name` adicionado
           placeholder="Ex: Sou um pregador expositivo, que busca aplicar a Bíblia de forma prática e encorajadora no dia a dia das pessoas..."
-          disabled={isPending}
+          value={personalDescription}
+          onChange={(e) => setPersonalDescription(e.target.value)}
+          disabled={isLoading}
           rows={5}
-          required // Campo obrigatório
         />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="file-upload" className="flex items-center gap-2">
           <Upload className="h-5 w-5" />
-          Ficheiro de Referência (Opcional)
+          Arquivo de Referência (Opcional)
         </Label>
         <p className="text-sm text-muted-foreground">
-          Envie um ficheiro (.pdf, .docx, .txt) com sermões ou anotações suas.
+          Envie um arquivo (.pdf, .docx, .txt) com sermões ou anotações suas.
         </p>
         <Input
           id="file-upload"
-          name="fileUpload" // Atributo `name` adicionado
           type="file"
-          disabled={isPending}
+          onChange={handleFileChange}
+          disabled={isLoading}
           accept=".pdf,.doc,.docx,.txt,.odt"
         />
+        {file && <p className="text-sm text-muted-foreground">Arquivo selecionado: {file.name}</p>}
       </div>
 
-      <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
-        {isPending ? 'A processar DNA...' : 'Guardar e Processar DNA'}
+      <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+        {isLoading ? 'Processando DNA...' : 'Salvar e Processar DNA'}
       </Button>
     </form>
   );
