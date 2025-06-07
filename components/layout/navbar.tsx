@@ -1,58 +1,77 @@
-// Caminho do ficheiro: components/layout/navbar.tsx
-'use client';
 
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import useScroll from "@/lib/hooks/use-scroll";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { useUser, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { Brain } from "lucide-react";
 
-export default function NavBar() {
-  const scrolled = useScroll(50);
-  const [isMounted, setIsMounted] = useState(false);
-
-  // useEffect só é executado no cliente (navegador).
-  // Isto garante que o estado isMounted só se torna verdadeiro no cliente.
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+export default function Navbar() {
+  const { isSignedIn } = useUser();
 
   return (
-    <div
-      className={`fixed top-0 w-full ${
-        scrolled
-          ? "border-b border-gray-200 bg-white/50 backdrop-blur-xl"
-          : "bg-white/0"
-      } z-30 transition-all`}
-    >
-      <div className="mx-5 flex h-16 max-w-screen-xl items-center justify-between xl:mx-auto">
-        <Link href="/" className="flex items-center font-display text-2xl">
-          <Image
-            src="/logo.png"
-            alt="Logo da Precedent"
-            width="30"
-            height="30"
-            className="mr-2 rounded-sm"
-          ></Image>
-          <p>Precedent</p>
-        </Link>
-        <div>
-          {/* Só renderizamos os botões do Clerk depois de o componente ser montado no cliente */}
-          {isMounted && (
-            <>
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <Button variant="default" size="sm">Sign In</Button>
-                </SignInButton>
-              </SignedOut>
-              <SignedIn>
-                <UserButton afterSignOutUrl="/" />
-              </SignedIn>
-            </>
-          )}
+    <nav className="border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Brain className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900">
+              SermonAI
+            </span>
+          </Link>
+
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link 
+              href="/" 
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Início
+            </Link>
+            {isSignedIn && (
+              <Link 
+                href="/dna" 
+                className="text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Meu DNA
+              </Link>
+            )}
+          </div>
+
+          {/* Auth Section */}
+          <div className="flex items-center space-x-4">
+            {isSignedIn ? (
+              <div className="flex items-center space-x-4">
+                <Link href="/dna">
+                  <Button variant="outline" size="sm">
+                    Configurar DNA
+                  </Button>
+                </Link>
+                <UserButton 
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8"
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/sign-in">Entrar</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/sign-up">Registar</Link>
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }
