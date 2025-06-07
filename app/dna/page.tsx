@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/components/ui/card";
-import DnaForm from "./dna-form";
+import DnaForm from "@/components/dna-form";
 
 export default async function DnaPage() {
   const { userId } = auth();
