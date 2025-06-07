@@ -5,6 +5,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { Suspense } from "react";
 import NavBar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 
 export const metadata = {
   title: "Precedent - Building blocks for your Next.js project",
@@ -29,6 +30,7 @@ export default async function RootLayout({
           </Suspense>
           <main className="relative z-10">{children}</main>
           <Footer />
+          <Sonner />
         </body>
       </html>
     </ClerkProvider>
