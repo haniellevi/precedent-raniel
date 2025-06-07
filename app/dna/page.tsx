@@ -8,9 +8,15 @@ import DnaForm from "./dna-form";
 
 export default async function DnaPage() {
   const { userId } = auth();
+  
+  console.log("DnaPage - userId:", userId);
+  
   if (!userId) {
+    console.log("Utilizador não autenticado, a redirecionar para /sign-in");
     redirect("/sign-in");
   }
+
+  console.log("Utilizador autenticado, a renderizar formulário de DNA");
 
   return (
     <div className="flex min-h-screen w-full flex-col items-center bg-muted/40 p-4 sm:p-6 md:p-10">
