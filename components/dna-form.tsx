@@ -1,0 +1,105 @@
+
+'use client';
+
+import { useState } from 'react';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Upload, Youtube, User } from 'lucide-react';
+
+// Este é um Client Component, pois lida com estado e interações do usuário.
+export default function DnaForm() {
+  // Estados para controlar os valores dos campos do formulário
+  const [youtubeLink, setYoutubeLink] = useState('');
+  const [personalDescription, setPersonalDescription] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setFile(event.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsLoading(true);
+
+    // Futuramente, aqui chamaremos uma Server Action para processar os dados.
+    console.log({
+      youtubeLink,
+      personalDescription,
+      fileName: file?.name,
+    });
+
+    // Simula uma chamada de API
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Lógica para lidar com a resposta (sucesso ou erro)
+    
+    setIsLoading(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="youtube-link" className="flex items-center gap-2">
+          <Youtube className="h-5 w-5" />
+          Link de Vídeo do YouTube
+        </Label>
+        <p className="text-sm text-muted-foreground">
+          Cole a URL de um sermão seu no YouTube para analisarmos sua fala.
+        </p>
+        <Input
+          id="youtube-link"
+          type="url"
+          placeholder="https://www.youtube.com/watch?v=..."
+          value={youtubeLink}
+          onChange={(e) => setYoutubeLink(e.target.value)}
+          disabled={isLoading}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="personal-description" className="flex items-center gap-2">
+          <User className="h-5 w-5" />
+          Como você se vê como pregador?
+        </Label>
+        <p className="text-sm text-muted-foreground">
+          Descreva seu estilo, tom e os temas que mais gosta de abordar.
+        </p>
+        <Textarea
+          id="personal-description"
+          placeholder="Ex: Sou um pregador expositivo, que busca aplicar a Bíblia de forma prática e encorajadora no dia a dia das pessoas..."
+          value={personalDescription}
+          onChange={(e) => setPersonalDescription(e.target.value)}
+          disabled={isLoading}
+          rows={5}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="file-upload" className="flex items-center gap-2">
+          <Upload className="h-5 w-5" />
+          Arquivo de Referência (Opcional)
+        </Label>
+        <p className="text-sm text-muted-foreground">
+          Envie um arquivo (.pdf, .docx, .txt) com sermões ou anotações suas.
+        </p>
+        <Input
+          id="file-upload"
+          type="file"
+          onChange={handleFileChange}
+          disabled={isLoading}
+          accept=".pdf,.doc,.docx,.txt,.odt"
+        />
+        {file && <p className="text-sm text-muted-foreground">Arquivo selecionado: {file.name}</p>}
+      </div>
+
+      <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+        {isLoading ? 'Processando DNA...' : 'Salvar e Processar DNA'}
+      </Button>
+    </form>
+  );
+}
