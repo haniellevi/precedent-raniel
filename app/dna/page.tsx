@@ -19,27 +19,29 @@ export default async function DnaPage() {
   console.log("Utilizador autenticado, a renderizar formulário de DNA");
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Gerir o Meu DNA de Pregador
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Aqui pode definir o seu estilo único de pregação para que a IA gere sermões com a sua voz.
-        </p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            Gerir o Meu DNA de Pregador
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Aqui pode definir o seu estilo único de pregação para que a IA gere sermões com a sua voz.
+          </p>
+        </div>
+        <Card className="bg-white shadow-lg border border-gray-200">
+          <CardHeader>
+            <CardTitle className="text-gray-900">O seu DNA Personalizado</CardTitle>
+            <CardDescription className="text-gray-600">
+              Forneça as suas referências para que a IA possa aprender o seu estilo.
+              Este processo só precisa de ser feito uma vez.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DnaForm />
+          </CardContent>
+        </Card>
       </div>
-      <Card className="bg-white shadow-lg">
-        <CardHeader>
-          <CardTitle>O seu DNA Personalizado</CardTitle>
-          <CardDescription>
-            Forneça as suas referências para que a IA possa aprender o seu estilo.
-            Este processo só precisa de ser feito uma vez.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DnaForm />
-        </CardContent>
-      </Card>
     </div>
   );
 }

@@ -10,6 +10,8 @@ import { processDnaData } from '@/app/actions/dnaActions';
 
 export default function DnaForm() {
   const [isPending, startTransition] = useTransition();
+  
+  console.log("DnaForm component is rendering");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
