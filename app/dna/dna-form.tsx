@@ -26,7 +26,7 @@ export default function DnaForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-lg shadow">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="youtube-link" className="flex items-center gap-2">
           <Youtube className="h-5 w-5" />
