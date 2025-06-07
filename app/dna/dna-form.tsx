@@ -1,44 +1,35 @@
-// Crie este novo arquivo em: components/dna-form.tsx
+// Caminho do ficheiro: app/dna/dna-form.tsx
 'use client';
 
-import { useState } from 'react';
-import { Label } from '@/components/components/ui/label';
-import { Input } from '@/components/components/ui/input';
-import { Textarea } from '@/components/components/ui/textarea';
-import { Button } from '@/components/components/ui/button';
+import { useState, useTransition } from 'react';
+
+// Corrigindo os caminhos de importação para os componentes da UI
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+
 import { Upload, Youtube, User } from 'lucide-react';
+import { processDnaData } from '@/app/actions/dnaActions';
 
-// Este é um Client Component, pois lida com estado e interações do usuário.
 export default function DnaForm() {
-  // Estados para controlar os valores dos campos do formulário
-  const [youtubeLink, setYoutubeLink] = useState('');
-  const [personalDescription, setPersonalDescription] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setFile(event.target.files[0]);
-    }
-  };
-
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsLoading(true);
+    const formData = new FormData(event.currentTarget);
 
-    // Futuramente, aqui chamaremos uma Server Action para processar os dados.
-    console.log({
-      youtubeLink,
-      personalDescription,
-      fileName: file?.name,
+    startTransition(async () => {
+      const result = await processDnaData(formData);
+
+      if (result?.errors) {
+        console.error("Erros de validação:", result.errors);
+        alert("Ocorreram erros de validação. Verifique a consola.");
+      } else {
+        console.log("Sucesso:", result?.message);
+        alert("Dados do DNA enviados para processamento!");
+      }
     });
-
-    // Simula uma chamada de API
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Lógica para lidar com a resposta (sucesso ou erro)
-
-    setIsLoading(false);
   };
 
   return (
@@ -49,56 +40,54 @@ export default function DnaForm() {
           Link de Vídeo do YouTube
         </Label>
         <p className="text-sm text-muted-foreground">
-          Cole a URL de um sermão seu no YouTube para analisarmos sua fala.
+          Cole o URL de um sermão seu no YouTube para analisarmos a sua fala.
         </p>
         <Input
           id="youtube-link"
+          name="youtubeLink"
           type="url"
           placeholder="https://www.youtube.com/watch?v=..."
-          value={youtubeLink}
-          onChange={(e) => setYoutubeLink(e.target.value)}
-          disabled={isLoading}
+          disabled={isPending}
         />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="personal-description" className="flex items-center gap-2">
           <User className="h-5 w-5" />
-          Como você se vê como pregador?
+          Como se vê como pregador?
         </Label>
         <p className="text-sm text-muted-foreground">
-          Descreva seu estilo, tom e os temas que mais gosta de abordar.
+          Descreva o seu estilo, tom e os temas que mais gosta de abordar.
         </p>
         <Textarea
           id="personal-description"
+          name="personalDescription"
           placeholder="Ex: Sou um pregador expositivo, que busca aplicar a Bíblia de forma prática e encorajadora no dia a dia das pessoas..."
-          value={personalDescription}
-          onChange={(e) => setPersonalDescription(e.target.value)}
-          disabled={isLoading}
+          disabled={isPending}
           rows={5}
+          required
         />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="file-upload" className="flex items-center gap-2">
           <Upload className="h-5 w-5" />
-          Arquivo de Referência (Opcional)
+          Ficheiro de Referência (Opcional)
         </Label>
         <p className="text-sm text-muted-foreground">
-          Envie um arquivo (.pdf, .docx, .txt) com sermões ou anotações suas.
+          Envie um ficheiro (.pdf, .docx, .txt) com sermões ou anotações suas.
         </p>
         <Input
           id="file-upload"
+          name="fileUpload"
           type="file"
-          onChange={handleFileChange}
-          disabled={isLoading}
+          disabled={isPending}
           accept=".pdf,.doc,.docx,.txt,.odt"
         />
-        {file && <p className="text-sm text-muted-foreground">Arquivo selecionado: {file.name}</p>}
       </div>
 
-      <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
-        {isLoading ? 'Processando DNA...' : 'Salvar e Processar DNA'}
+      <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
+        {isPending ? 'A processar DNA...' : 'Guardar e Processar DNA'}
       </Button>
     </form>
   );

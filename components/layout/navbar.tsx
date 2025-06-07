@@ -1,14 +1,22 @@
-
+// Caminho do ficheiro: components/layout/navbar.tsx
 'use client';
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import useScroll from "@/lib/hooks/use-scroll";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 
 export default function NavBar() {
   const scrolled = useScroll(50);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // useEffect só é executado no cliente (navegador).
+  // Isto garante que o estado isMounted só se torna verdadeiro no cliente.
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <div
@@ -22,22 +30,27 @@ export default function NavBar() {
         <Link href="/" className="flex items-center font-display text-2xl">
           <Image
             src="/logo.png"
-            alt="Precedent logo"
+            alt="Logo da Precedent"
             width="30"
             height="30"
             className="mr-2 rounded-sm"
-          />
+          ></Image>
           <p>Precedent</p>
         </Link>
         <div>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <Button variant="default">Sign In</Button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+          {/* Só renderizamos os botões do Clerk depois de o componente ser montado no cliente */}
+          {isMounted && (
+            <>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <Button variant="default" size="sm">Sign In</Button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
+            </>
+          )}
         </div>
       </div>
     </div>
