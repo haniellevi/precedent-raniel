@@ -1,0 +1,90 @@
+Olá! Por favor, execute as seguintes tarefas para corrigir o cabeçalho da aplicação e remover os botões de login duplicados.
+
+Tarefa 1: Atualizar o componente do Cabeçalho
+
+O arquivo do cabeçalho principal do template Precedent está em components/layout/navbar.tsx. Substitua todo o conteúdo deste arquivo pelo código abaixo. Este novo código integra perfeitamente os botões de autenticação do Clerk.
+
+// Caminho do arquivo: components/layout/navbar.tsx
+
+'use client';
+
+import Image from "next/image";
+import Link from "next/link";
+import useScroll from "@/lib/hooks/use-scroll";
+import { useSignInModal } from "@/components/layout/sign-in-modal";
+import UserDropdown from "@/components/layout/user-dropdown";
+import { Session } from "next-auth";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { Button } from "../ui/button";
+
+export default function NavBar() {
+  const { SignInModal, setShowSignInModal } = useSignInModal();
+  const scrolled = useScroll(50);
+
+  return (
+    <>
+      <SignInModal />
+      <div
+        className={`fixed top-0 w-full ${
+          scrolled
+            ? "border-b border-gray-200 bg-white/50 backdrop-blur-xl"
+            : "bg-white/0"
+        } z-30 transition-all`}
+      >
+        <div className="mx-5 flex h-16 max-w-screen-xl items-center justify-between xl:mx-auto">
+          <Link href="/" className="flex items-center font-display text-2xl">
+            <Image
+              src="/logo.png"
+              alt="Precedent logo"
+              width="30"
+              height="30"
+              className="mr-2 rounded-sm"
+            ></Image>
+            <p>Precedent</p>
+          </Link>
+          <div>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button variant="default">Sign In</Button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              {/* O UserButton do Clerk já contém o dropdown com "Gerenciar Conta" e "Sair" */}
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+Tarefa 2: Limpar o Layout Principal
+
+Agora, para evitar duplicidade, precisamos remover os botões do Clerk que foram colocados diretamente no arquivo de layout principal.
+
+Abra o arquivo app/layout.tsx e garanta que ele não tenha mais os componentes <SignInButton>, <SignUpButton>, <UserButton>, <SignedIn> ou <SignedOut> dentro dele. Ele deve apenas renderizar o componente <NavBar /> que acabamos de corrigir.
+
+O body dentro de app/layout.tsx deve ficar parecido com isto:
+
+// ...dentro de app/layout.tsx
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ClerkProvider>
+      <html lang="en">
+        <body>
+          <div className="fixed h-screen w-full bg-gradient-to-br from-indigo-50 via-white to-cyan-100" />
+          <Suspense fallback="...">
+            {/* @ts-expect-error Server Component */}
+            <NavBar />
+          </Suspense>
+          <main className="flex min-h-screen w-full flex-col items-center justify-center py-32">
+            {children}
+          </main>
+          <Footer />
+        </body>
+      </html>
+    </ClerkProvider>
+  );
+}
