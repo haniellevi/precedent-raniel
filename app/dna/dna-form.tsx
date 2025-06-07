@@ -1,6 +1,8 @@
+
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useTransition } from 'react';
+import { toast } from "sonner"; // Importa a função de notificação
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,8 +12,6 @@ import { processDnaData } from '@/app/actions/dnaActions';
 
 export default function DnaForm() {
   const [isPending, startTransition] = useTransition();
-  
-  console.log("DnaForm component is rendering");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -19,10 +19,16 @@ export default function DnaForm() {
 
     startTransition(async () => {
       const result = await processDnaData(formData);
-      if (result?.errors) {
-        alert("Ocorreram erros de validação. Verifique a consola.");
-      } else {
-        alert("Dados do DNA enviados para processamento!");
+      
+      // Usa as notificações em vez de alert()
+      if (result.success && result.message) {
+        toast.success("DNA enviado com sucesso!", {
+          description: result.message,
+        });
+      } else if (result.error) {
+        toast.error("Ocorreu um erro", {
+          description: result.error,
+        });
       }
     });
   };
@@ -34,6 +40,7 @@ export default function DnaForm() {
           <Youtube className="h-5 w-5" />
           Link de Vídeo do YouTube
         </Label>
+        <p className="text-sm text-muted-foreground">Cole o URL de um sermão seu no YouTube para analisarmos a sua fala.</p>
         <Input id="youtube-link" name="youtubeLink" type="url" placeholder="https://www.youtube.com/watch?v=..." disabled={isPending} />
       </div>
       <div className="space-y-2">
@@ -41,13 +48,15 @@ export default function DnaForm() {
           <User className="h-5 w-5" />
           Como se vê como pregador?
         </Label>
-        <Textarea id="personal-description" name="personalDescription" placeholder="Descreva o seu estilo..." disabled={isPending} rows={5} required />
+        <p className="text-sm text-muted-foreground">Descreva o seu estilo, tom e os temas que mais gosta de abordar.</p>
+        <Textarea id="personal-description" name="personalDescription" placeholder="Ex: Sou um pregador expositivo..." disabled={isPending} rows={5} required />
       </div>
       <div className="space-y-2">
         <Label htmlFor="file-upload" className="flex items-center gap-2">
           <Upload className="h-5 w-5" />
           Ficheiro de Referência (Opcional)
         </Label>
+        <p className="text-sm text-muted-foreground">Envie um ficheiro (.pdf, .docx, .txt) com sermões ou anotações suas.</p>
         <Input id="file-upload" name="fileUpload" type="file" disabled={isPending} accept=".pdf,.doc,.docx,.txt,.odt" />
       </div>
       <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
