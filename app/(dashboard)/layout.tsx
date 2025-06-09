@@ -60,8 +60,10 @@ export default async function DashboardLayout({
       </header>
 
       {/* Conteúdo principal da página */}
-      <main className="container flex-1 items-start py-8">
-        {children}
+      <main className="container flex-1 items-start py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
 
       {/* 2. Adicione o componente Footer aqui */}

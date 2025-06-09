@@ -35,13 +35,14 @@ export default function SermonGenerationForm({ onSermonGenerated }: SermonGenera
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Gerar Novo Sermão</CardTitle>
-        <CardDescription>
-          Preencha os campos abaixo para criar um sermão personalizado com base no seu DNA.
-        </CardDescription>
-      </CardHeader>
+    <div className="max-w-4xl mx-auto">
+      <Card>
+        <CardHeader>
+          <CardTitle>Gerar Novo Sermão</CardTitle>
+          <CardDescription>
+            Preencha os campos abaixo para criar um sermão personalizado com base no seu DNA.
+          </CardDescription>
+        </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
@@ -94,5 +95,6 @@ export default function SermonGenerationForm({ onSermonGenerated }: SermonGenera
         </form>
       </CardContent>
     </Card>
+    </div>
   );
 }

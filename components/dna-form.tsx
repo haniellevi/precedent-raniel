@@ -42,7 +42,8 @@ export default function DnaForm({ initialProfile }: DnaFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <div className="max-w-2xl mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-8">
       {/* Seção de Upload de Arquivo */}
       <div className="space-y-2">
         <Label htmlFor="sermon-file" className="text-base font-semibold">
@@ -122,6 +123,7 @@ export default function DnaForm({ initialProfile }: DnaFormProps) {
         )}
       </div>
     </form>
+    </div>
   );
 }
 
