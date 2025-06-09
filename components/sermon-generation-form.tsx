@@ -1,22 +1,19 @@
 
-// components/sermon-generation-form.tsx
 'use client';
 
 import { useState } from 'react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Textarea } from './ui/textarea';
-import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2, Sparkles } from 'lucide-react';
+import { Sermon } from '@/lib/mockApi';
 
 interface SermonGenerationFormProps {
-  onSermonGenerated: (sermon: any) => void;
+  onSermonGenerated: (sermon: Sermon) => void;
 }
-
-// Importe a função do mock
-import { generateSermon } from '@/lib/mockApi';
 
 export default function SermonGenerationForm({ onSermonGenerated }: SermonGenerationFormProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,76 +22,133 @@ export default function SermonGenerationForm({ onSermonGenerated }: SermonGenera
     event.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(event.currentTarget);
-    const params = Object.fromEntries(formData.entries());
-    
-    const sermon = await generateSermon(params);
-    
-    onSermonGenerated(sermon);
-    setIsLoading(false);
+    try {
+      const formData = new FormData(event.currentTarget);
+      const params = Object.fromEntries(formData.entries());
+      
+      const response = await fetch('/api/sermons', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(params),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao gerar sermão');
+      }
+
+      const sermon = await response.json();
+      onSermonGenerated(sermon);
+    } catch (error) {
+      console.error('Erro ao gerar sermão:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle>Gerar Novo Sermão</CardTitle>
-          <CardDescription>
-            Preencha os campos abaixo para criar um sermão personalizado com base no seu DNA.
-          </CardDescription>
-        </CardHeader>
+    <Card>
+      <CardHeader>
+        <CardTitle>Gerador de Sermão</CardTitle>
+        <CardDescription>
+          Insira os parâmetros desejados para gerar um sermão personalizado
+        </CardDescription>
+      </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="theme">Tema Central</Label>
-            <Input id="theme" name="theme" placeholder="Ex: A Graça de Deus" required />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="theme">Tema Principal</Label>
+              <Input
+                id="theme"
+                name="theme"
+                placeholder="Ex: Esperança, Fé, Amor"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="purpose">Propósito</Label>
+              <Select name="purpose" required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o propósito" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="inspirar">Inspirar</SelectItem>
+                  <SelectItem value="ensinar">Ensinar</SelectItem>
+                  <SelectItem value="confrontar">Confrontar</SelectItem>
+                  <SelectItem value="consolar">Consolar</SelectItem>
+                  <SelectItem value="motivar">Motivar</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="duration">Duração (minutos)</Label>
+              <Select name="duration" required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Duração do sermão" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="15">15 minutos</SelectItem>
+                  <SelectItem value="20">20 minutos</SelectItem>
+                  <SelectItem value="30">30 minutos</SelectItem>
+                  <SelectItem value="45">45 minutos</SelectItem>
+                  <SelectItem value="60">60 minutos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="audience">Audiência</Label>
+              <Select name="audience">
+                <SelectTrigger>
+                  <SelectValue placeholder="Tipo de audiência" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="geral">Congregação Geral</SelectItem>
+                  <SelectItem value="jovens">Jovens</SelectItem>
+                  <SelectItem value="adultos">Adultos</SelectItem>
+                  <SelectItem value="criancas">Crianças</SelectItem>
+                  <SelectItem value="casais">Casais</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="purpose">Propósito Principal</Label>
-            <Select name="purpose" defaultValue="Inspirar">
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um propósito" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Inspirar">Inspirar</SelectItem>
-                <SelectItem value="Ensinar">Ensinar</SelectItem>
-                <SelectItem value="Confrontar">Confrontar</SelectItem>
-                <SelectItem value="Consolar">Consolar</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="audience">Público-Alvo</Label>
-            <Input id="audience" name="audience" placeholder="Ex: Jovens, Famílias, Igreja em geral" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="duration">Duração Aproximada (min)</Label>
-            <Input id="duration" name="duration" type="number" defaultValue={25} />
-          </div>
-          <div className="md:col-span-2 space-y-2">
-            <Label htmlFor="custom-prompt">Seu Próprio Prompt / Texto Base</Label>
-            <Textarea
-              id="custom-prompt"
-              name="custom-prompt"
-              placeholder="Opcional: Insira aqui um esboço, um versículo chave ou um resumo que você queira usar como base..."
-              rows={4}
+
+          <div>
+            <Label htmlFor="scripture">Texto Bíblico Base (Opcional)</Label>
+            <Input
+              id="scripture"
+              name="scripture"
+              placeholder="Ex: João 3:16, Salmos 23, Romanos 8:28"
             />
           </div>
-          <div className="md:col-span-2 flex justify-end">
-            <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Gerando com IA...
-                </>
-              ) : (
-                'Gerar Sermão'
-              )}
-            </Button>
+
+          <div>
+            <Label htmlFor="context">Contexto Especial (Opcional)</Label>
+            <Textarea
+              id="context"
+              name="context"
+              placeholder="Descreva algum contexto especial para este sermão..."
+              rows={3}
+            />
           </div>
+
+          <Button type="submit" disabled={isLoading} className="w-full">
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Gerando Sermão...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Gerar Sermão
+              </>
+            )}
+          </Button>
         </form>
       </CardContent>
     </Card>
-    </div>
   );
 }

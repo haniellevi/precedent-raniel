@@ -1,12 +1,29 @@
 // app/(dashboard)/dna/page.tsx
-import { getDnaProfile } from '@/lib/mockApi';
-import DnaForm from '@/components/dna-form';
+import DnaForm from "@/components/dna-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DnaProfile } from '@/lib/mockApi';
 
-// Esta é uma página assíncrona (Server Component)
+// Função para buscar dados no servidor
+async function getDnaData(): Promise<DnaProfile> {
+  // A URL deve ser absoluta no servidor
+  const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+  try {
+    const res = await fetch(`${baseUrl}/api/dna`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch');
+    return res.json();
+  } catch (error) {
+    console.error('Erro ao buscar DNA:', error);
+    // Retorna dados padrão em caso de erro
+    return {
+      type: 'padrao',
+      name: 'DNA Padrão',
+      calculatedPpm: 100
+    };
+  }
+}
+
 export default async function DnaPage() {
-  // 1. Busca os dados no servidor usando nosso serviço de mock
-  const dnaProfile = await getDnaProfile();
+  const dnaProfile = await getDnaData();
 
   // 2. Renderiza a estrutura da página e passa os dados para o Client Component
   return (
