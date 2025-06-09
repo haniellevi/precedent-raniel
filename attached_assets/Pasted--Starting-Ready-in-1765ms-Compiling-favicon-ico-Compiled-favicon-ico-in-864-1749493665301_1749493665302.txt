@@ -1,0 +1,81 @@
+
+ ✓ Starting...
+ ✓ Ready in 1765ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 864ms (57 modules)
+ GET /favicon.ico 200 in 987ms
+ ✓ Compiled /middleware in 397ms (182 modules)
+ ○ Compiling / ...
+ ⨯ ./app/page.tsx
+Error: 
+  × Expected ';', '}' or <eof>
+     ╭─[/home/runner/workspace/app/page.tsx:105:1]
+ 105 │         </div>
+ 106 │       );
+ 107 │     }
+ 108 │ ╭─▶ ```
+ 109 │ │   
+ 110 │ ├─▶ ```html
+     · ╰───   ────
+     · ╰──── This is the expression part of an expression statement
+ 111 │     import Link from "next/link";
+ 112 │     import { Button } from "@/components/ui/button";
+ 113 │     import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/page.tsx
+ ⨯ ./app/page.tsx
+Error: 
+  × Expected ';', '}' or <eof>
+     ╭─[/home/runner/workspace/app/page.tsx:105:1]
+ 105 │         </div>
+ 106 │       );
+ 107 │     }
+ 108 │ ╭─▶ ```
+ 109 │ │   
+ 110 │ ├─▶ ```html
+     · ╰───   ────
+     · ╰──── This is the expression part of an expression statement
+ 111 │     import Link from "next/link";
+ 112 │     import { Button } from "@/components/ui/button";
+ 113 │     import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/page.tsx
+ ⨯ ./app/page.tsx
+Error: 
+  × Expected ';', '}' or <eof>
+     ╭─[/home/runner/workspace/app/page.tsx:105:1]
+ 105 │         </div>
+ 106 │       );
+ 107 │     }
+ 108 │ ╭─▶ ```
+ 109 │ │   
+ 110 │ ├─▶ ```html
+     · ╰───   ────
+     · ╰──── This is the expression part of an expression statement
+ 111 │     import Link from "next/link";
+ 112 │     import { Button } from "@/components/ui/button";
+ 113 │     import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/page.tsx
+ GET / 500 in 10443ms
+ GET /_next/static/webpack/0f90f8132b6022d6.webpack.hot-update.json 500 in 7054ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 500 in 55ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/home/runner/workspace/.next/cache/webpack/client-development-fallback/1.pack.gz_' -> '/home/runner/workspace/.next/cache/webpack/client-development-fallback/1.pack.gz'
+ GET /favicon.ico 500 in 8ms
+^C
