@@ -1,27 +1,29 @@
 
+import { BuyMeACoffee } from "../shared/icons";
+
 export default function Footer() {
   return (
-    <footer className="border-t bg-background">
-      <div className="container py-8">
-        <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-muted-foreground">
-              © 2024 SermonAI. Todos os direitos reservados.
-            </span>
-          </div>
-          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-            <a href="/terms" className="hover:text-foreground transition-colors">
-              Termos
-            </a>
-            <a href="/privacy" className="hover:text-foreground transition-colors">
-              Privacidade
-            </a>
-            <a href="/contact" className="hover:text-foreground transition-colors">
-              Contato
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <div className="absolute w-full py-5 text-center">
+      <p className="text-gray-500">
+        A project by{" "}
+        <a
+          className="font-semibold text-gray-600 underline-offset-4 transition-colors hover:underline"
+          href="https://twitter.com/steventey"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Steven Tey
+        </a>
+      </p>
+      <a
+        href="https://www.buymeacoffee.com/steventey"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mx-auto mt-2 flex max-w-fit items-center justify-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 shadow-md transition-colors hover:border-gray-800"
+      >
+        <BuyMeACoffee className="h-5 w-5" />
+        <p>Buy me a coffee</p>
+      </a>
+    </div>
   );
 }
