@@ -1,0 +1,229 @@
+Olá! Por favor, execute as seguintes tarefas para conectar o Painel Administrativo à camada de API, finalizando a arquitetura do nosso protótipo.
+
+Tarefa 1: Criar os Route Handlers da API para o Admin
+Ação: Crie a seguinte estrutura de pastas e arquivos dentro de app/api/admin/.
+
+1. Crie o arquivo: app/api/admin/metrics/route.ts
+
+// app/api/admin/metrics/route.ts
+import { NextResponse } from 'next/server';
+import { mockAdminMetricsData } from '@/lib/mockApi';
+
+export async function GET() {
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simula latência
+  return NextResponse.json(mockAdminMetricsData);
+}
+
+2. Crie o arquivo: app/api/admin/users/route.ts
+
+// app/api/admin/users/route.ts
+import { NextResponse } from 'next/server';
+import { mockAdminUsersData } from '@/lib/mockApi';
+
+export async function GET() {
+  await new Promise(resolve => setTimeout(resolve, 800));
+  return NextResponse.json(mockAdminUsersData);
+}
+
+3. Crie o arquivo: app/api/admin/prompts/route.ts
+
+// app/api/admin/prompts/route.ts
+import { NextResponse } from 'next/server';
+import { mockAgentPromptsData } from '@/lib/mockApi';
+
+export async function GET() {
+  await new Promise(resolve => setTimeout(resolve, 600));
+  return NextResponse.json(mockAgentPromptsData);
+}
+
+export async function POST(request: Request) {
+    const { id, prompt } = await request.json();
+    console.log(`API RECEBEU DADOS PARA ATUALIZAR PROMPT ${id}:`, prompt);
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    return NextResponse.json({ success: true });
+}
+
+Tarefa 2: Atualizar as Páginas do Admin para Usar a API
+Ação: Modifique as páginas do Painel Administrativo para que façam chamadas fetch às novas rotas de API.
+
+1. Edite o arquivo: app/(admin)/dashboard/page.tsx
+
+// app/(admin)/dashboard/page.tsx
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, FileText, CheckCircle, BrainCircuit } from 'lucide-react';
+import { AdminMetrics } from "@/lib/mockApi";
+
+async function getMetricsData(): Promise<AdminMetrics> {
+  const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/admin/metrics`, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Failed to fetch metrics');
+  return res.json();
+}
+
+export default async function AdminDashboardPage() {
+  const metrics = await getMetricsData();
+
+  return (
+    <div>
+      <h1 className="text-3xl font-bold tracking-tight mb-6">Dashboard Administrativo</h1>
+      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{metrics.totalUsers}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Sermões</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{metrics.totalSermons}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Assinaturas Ativas</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{metrics.activeSubscriptions}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">DNAs Customizados</CardTitle>
+            <BrainCircuit className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{metrics.dnaUsage.custom}</div></CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+2. Edite o arquivo: app/(admin)/usuarios/page.tsx
+
+// app/(admin)/usuarios/page.tsx
+import UsersTable from "@/components/admin/users-table";
+import { Suspense } from "react";
+import { AdminUser } from "@/lib/mockApi";
+
+function LoadingSkeleton() { /* ... (código existente) ... */ }
+
+async function UsersData() {
+    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/admin/users`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch users');
+    const users: AdminUser[] = await res.json();
+    return <UsersTable users={users} />;
+}
+
+export default function AdminUsersPage() {
+  return (
+    <div>
+        <h1 className="text-3xl font-bold tracking-tight mb-6">Gerenciamento de Usuários</h1>
+        <Suspense fallback={<LoadingSkeleton />}>
+            {/* @ts-expect-error Server Component */}
+            <UsersData />
+        </Suspense>
+    </div>
+  );
+}
+
+3. Edite o arquivo: app/(admin)/gerenciar-ia/page.tsx
+
+// app/(admin)/gerenciar-ia/page.tsx
+import PromptEditorForm from "@/components/admin/prompt-editor-form";
+import { AgentPrompt } from "@/lib/mockApi";
+
+async function getPromptsData(): Promise<AgentPrompt[]> {
+    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/admin/prompts`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch prompts');
+    return res.json();
+}
+
+export default async function ManageAiPage() {
+    const prompts = await getPromptsData();
+    
+    return (
+        <div className="space-y-8">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Gerenciar Agentes de IA</h1>
+                <p className="text-muted-foreground mt-2">
+                    Edite os prompts de sistema para refinar o comportamento e a qualidade das respostas da IA.
+                </p>
+            </div>
+
+            {prompts.map((prompt) => (
+                <PromptEditorForm key={prompt.id} promptData={prompt} />
+            ))}
+        </div>
+    );
+}
+
+4. Edite o arquivo: components/admin/prompt-editor-form.tsx
+
+Altere a função handleSubmit para usar fetch.
+
+// components/admin/prompt-editor-form.tsx
+'use client';
+
+import { useState } from 'react';
+import { AgentPrompt } from '@/lib/mockApi';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
+
+interface PromptEditorFormProps {
+  promptData: AgentPrompt;
+}
+
+export default function PromptEditorForm({ promptData }: PromptEditorFormProps) {
+  const [prompt, setPrompt] = useState(promptData.prompt);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+    
+    await fetch('/api/admin/prompts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: promptData.id, prompt: prompt }),
+    });
+
+    setIsLoading(false);
+    // Poderíamos adicionar uma notificação de sucesso aqui (toast)
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{promptData.name}</CardTitle>
+        <CardDescription>{promptData.description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor={promptData.id} className="sr-only">Prompt</Label>
+            <Textarea
+              id={promptData.id}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              rows={15}
+              className="font-mono text-sm"
+            />
+          </div>
+          <div className="flex justify-end">
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Salvar Prompt
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
