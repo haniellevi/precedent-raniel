@@ -35,9 +35,15 @@ export default async function DashboardLayout({
             <nav className="flex items-center space-x-6 text-sm font-medium">
               <Link
                 href="/gerar"
-                className="transition-colors hover:text-foreground/80 text-foreground"
+                className="transition-colors hover:text-foreground/80 text-muted-foreground"
               >
                 Gerar Sermão
+              </Link>
+              <Link
+                href="/historico"
+                className="transition-colors hover:text-foreground/80 text-muted-foreground"
+              >
+                Histórico
               </Link>
               <Link
                 href="/dna"
@@ -45,7 +51,6 @@ export default async function DashboardLayout({
               >
                 Meu DNA
               </Link>
-              {/* Adicione outros links aqui no futuro */}
             </nav>
             <div className="flex items-center space-x-4">
                <UserButton afterSignOutUrl="/" />

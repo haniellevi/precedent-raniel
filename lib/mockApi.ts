@@ -38,42 +38,71 @@ const mockDnaProfile: DnaProfile = {
   calculatedPpm: 120,
 };
 
-const generatedSermonMock: Sermon = {
-    id: 'sermon-gen-001',
+const mockSermonHistory: Sermon[] = [
+  {
+    id: 'sermon-001',
     title: 'A Coragem para Recomeçar',
-    content: `
-# A Coragem para Recomeçar
+    content: `# A Coragem para Recomeçar
 
 ## Introdução
-Todos nós, em algum momento, enfrentamos a necessidade de recomeçar. Seja após um erro, uma perda ou simplesmente uma mudança de estação na vida. A Bíblia está repleta de histórias sobre novos começos, e hoje vamos explorar como encontrar a coragem necessária para dar o primeiro passo.
+Todos nós enfrentamos momentos em que precisamos recomeçar. Seja após uma queda, um fracasso ou simplesmente uma mudança de direção na vida.
 
-## Ponto 1: A Redenção de Pedro
-Lembre-se de Pedro. Após negar a Jesus três vezes, ele se sentiu um fracasso total. Ele voltou a pescar, talvez pensando que seu tempo como discípulo havia acabado. Mas na praia, Jesus o encontrou e, em vez de repreendê-lo, ofereceu-lhe café da manhã e lhe deu uma nova missão: "Apascenta as minhas ovelhas". 
-
-Isso nos ensina uma verdade poderosa: **nosso passado não define nosso futuro aos olhos de Deus**. A restauração está sempre disponível.
-
-* Negação → Medo e Vergonha
-* Restauração → Coragem e Propósito
-
-## Ponto 2: A Oportunidade na Adversidade
-Considere José. Vendido como escravo por seus irmãos, falsamente acusado e jogado na prisão. Cada passo parecia um beco sem saída. No entanto, cada adversidade foi, na verdade, um degrau que o preparou para o palácio. Ele mesmo disse a seus irmãos: "Vocês planejaram o mal contra mim, mas Deus o tornou em bem".
+## Desenvolvimento
+1. **O poder do recomeço está em Deus**
+2. **Não olhe para trás com arrependimento**
+3. **Confie no plano divino para sua vida**
 
 ## Conclusão
-Que possamos ter a coragem de aceitar a graça de Deus para recomeçar, assim como Pedro, e a sabedoria para ver a mão de Deus trabalhando em nossas adversidades, assim como José. O novo começo que você tanto anseia pode estar a uma oração de distância. Amém.
-    `,
-    enrichmentSuggestions: `
-* **Ilustração:** Use a metáfora de uma árvore podada que, na primavera seguinte, cresce mais forte e com mais frutos.
-* **Pergunta para Reflexão:** Peça para a congregação pensar silenciosamente: "Qual área da minha vida eu sinto que é tarde demais para recomeçar? O que me impede de entregar isso a Deus?".
-* **Dinâmica:** Incentive as pessoas a escreverem em um pequeno pedaço de papel uma área de fracasso e, simbolicamente, deixá-lo no altar ao final do culto.
-    `,
-    parameters: {
-      theme: 'Recomeço',
-      purpose: 'Inspirar',
-      duration: 20,
-    },
-    createdAt: new Date().toISOString(),
-};
+Deus sempre nos dá uma nova oportunidade. O importante é ter coragem para dar o primeiro passo.`,
+    enrichmentSuggestions: `* Ilustração: Use a metáfora de uma árvore podada que cresce mais forte
+* Dinâmica: Peça para as pessoas escreverem algo que querem recomeçar
+* Versículo chave: Lamentações 3:22-23`,
+    parameters: { theme: 'Recomeço', purpose: 'Inspirar', duration: 20 },
+    createdAt: '2025-01-06T10:00:00Z',
+  },
+  {
+    id: 'sermon-002',
+    title: 'Vivendo em Comunidade',
+    content: `# Vivendo em Comunidade
 
+## Introdução
+Deus não nos criou para viver isolados. A comunidade é essencial para nosso crescimento espiritual.
+
+## Desenvolvimento
+1. **A importância do amor fraternal**
+2. **Como resolver conflitos com amor**
+3. **Edificando uns aos outros**
+
+## Conclusão
+Quando vivemos em verdadeira comunidade, refletimos o coração de Deus.`,
+    enrichmentSuggestions: `* Dinâmica: Peça para as pessoas se cumprimentarem e orarem umas pelas outras
+* Ilustração: Use o exemplo de uma fogueira - as brasas juntas mantêm o fogo aceso
+* Versículo chave: Hebreus 10:24-25`,
+    parameters: { theme: 'Comunidade', purpose: 'Ensinar', duration: 30 },
+    createdAt: '2025-01-05T11:30:00Z',
+  },
+  {
+    id: 'sermon-003',
+    title: 'O Propósito na Espera',
+    content: `# O Propósito na Espera
+
+## Introdução
+A espera pode ser um dos momentos mais difíceis da vida cristã. Mas Deus tem um propósito em cada período de espera.
+
+## Desenvolvimento
+1. **Deus trabalha durante nossa espera**
+2. **A espera desenvolve nosso caráter**
+3. **Confiar no tempo de Deus**
+
+## Conclusão
+Na espera, aprendemos a depender completamente de Deus e descobrimos Sua fidelidade.`,
+    enrichmentSuggestions: `* Versículo Chave: Isaías 40:31
+* Ilustração: Use o exemplo de uma borboleta no casulo
+* Oração: Ore pelos que estão em período de espera`,
+    parameters: { theme: 'Paciência', purpose: 'Consolar', duration: 25 },
+    createdAt: '2025-01-04T09:45:00Z',
+  },
+];
 
 // --- Funções do Serviço Mock ---
 
@@ -89,5 +118,12 @@ export const updateDnaProfile = async (data: any): Promise<{ success: boolean }>
 
 export const generateSermon = async (params: any): Promise<Sermon> => {
   console.log('MOCK API: Gerando sermão com parâmetros:', params);
-  return new Promise((resolve) => setTimeout(() => resolve(generatedSermonMock), 3000));
+  // Retorna o primeiro item do histórico como se tivesse sido gerado agora
+  const newSermon = { ...mockSermonHistory[0], id: `gen-${Date.now()}`, createdAt: new Date().toISOString() };
+  return new Promise((resolve) => setTimeout(() => resolve(newSermon), 3000));
+};
+
+export const getSermonHistory = async (): Promise<Sermon[]> => {
+  console.log('MOCK API: Buscando histórico de sermões...');
+  return new Promise((resolve) => setTimeout(() => resolve(mockSermonHistory), 800));
 };
