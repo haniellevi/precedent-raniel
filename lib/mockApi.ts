@@ -1,10 +1,9 @@
-
 // Mock functions for API calls
 
 export async function updateDnaProfile(profileData: any) {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   return {
     success: true,
     data: profileData
@@ -14,7 +13,7 @@ export async function updateDnaProfile(profileData: any) {
 export async function generateSermon(data: any) {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
   return {
     id: 'sermon-' + Date.now(),
     title: 'Sermão Gerado: ' + data.theme,
