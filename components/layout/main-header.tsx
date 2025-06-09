@@ -18,21 +18,13 @@ export default function MainHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-        <div className="flex gap-6 md:gap-10">
-          <Link href="/gerar" className="flex items-center space-x-2">
-            <Image
-              src="/logo.png"
-              alt="SermonAI Logo"
-              width={24}
-              height={24}
-              className="h-6 w-6"
-            />
-            <span className="inline-block font-bold">SermonAI</span>
+      <div className="container flex h-16 items-center">
+        <div className="mr-4 hidden md:flex">
+          <Link href="/gerar" className="mr-6 flex items-center space-x-2">
+            <Image src="/logo.png" alt="SermonAI Logo" width={24} height={24} />
+            <span className="font-bold">SermonAI</span>
           </Link>
-        </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <nav className="flex items-center space-x-6 text-sm font-medium">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -46,9 +38,9 @@ export default function MainHeader() {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center space-x-4">
-            <UserButton afterSignOutUrl="/" />
-          </div>
+        </div>
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          <UserButton afterSignOutUrl="/" />
         </div>
       </div>
     </header>
