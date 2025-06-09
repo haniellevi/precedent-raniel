@@ -1,0 +1,197 @@
+Olá! Por favor, execute as seguintes tarefas no projeto Next.js para construir a seção "Gerenciar IA" do Painel Administrativo.
+
+Tarefa 1: Atualizar o Serviço de Mock com Dados de IA
+Ação: Substitua completamente o conteúdo do arquivo lib/mockApi.ts pelo código abaixo. Ele adiciona mocks para os prompts dos agentes de IA.
+
+Caminho do Arquivo: lib/mockApi.ts
+
+// lib/mockApi.ts
+
+// --- Interfaces de Dados ---
+export interface DnaProfile { /* ... */ }
+export interface Sermon { /* ... */ }
+export interface AdminUser { /* ... */ }
+export interface AdminMetrics { /* ... */ }
+
+// NOVA INTERFACE
+export interface AgentPrompt {
+  id: 'dna_agent' | 'sermon_agent';
+  name: string;
+  description: string;
+  prompt: string;
+  updatedAt: string;
+}
+
+// --- Dados Mock ---
+const mockDnaProfile: DnaProfile = { type: 'customizado', name: 'Meu DNA Personalizado', customAttributes: { style: 'Expositivo e Prático', tone: 'Inspirador e Encorajador', vocabulary: ['graça', 'redenção', 'propósito', 'comunidade'], }, calculatedPpm: 120, };
+const mockSermonHistory: Sermon[] = [ { id: 'sermon-001', title: 'A Coragem para Recomeçar', content: `# A Coragem para Recomeçar...`, enrichmentSuggestions: `* Ilustração...`, parameters: { theme: 'Recomeço', purpose: 'Inspirar', duration: 20 }, createdAt: '2025-06-05T10:00:00Z', }, { id: 'sermon-002', title: 'Vivendo em Comunidade', content: `# Vivendo em Comunidade...`, enrichmentSuggestions: `* Dinâmica...`, parameters: { theme: 'Comunidade', purpose: 'Ensinar', duration: 30 }, createdAt: '2025-05-28T11:30:00Z', }, ];
+const mockAdminUsers: AdminUser[] = [ { id: 'user_2iabcde', name: 'Haniel Levi', email: 'haniel.levi@example.com', role: 'admin', isActive: true, createdAt: '2025-04-10T08:00:00Z'}, { id: 'user_2ifghij', name: 'Maria Silva', email: 'maria.silva@example.com', role: 'pro', isActive: true, createdAt: '2025-05-20T14:00:00Z'}, ];
+const mockAdminMetrics: AdminMetrics = { totalUsers: 138, totalSermons: 452, activeSubscriptions: 73, dnaUsage: { standard: 65, custom: 73 }, };
+
+// NOVOS DADOS
+const mockAgentPrompts: AgentPrompt[] = [
+    {
+        id: 'dna_agent',
+        name: 'Agente Criador de DNA',
+        description: 'Responsável por analisar os materiais do usuário e extrair seu perfil de pregador.',
+        prompt: 'Você é um especialista em análise de estilo e homilética. Analise o texto fornecido e extraia os seguintes atributos em formato JSON: estilo de pregação (expositivo, temático), tom (inspirador, confrontador), e um array de 5 a 10 palavras-chave mais utilizadas.',
+        updatedAt: '2025-06-01T12:00:00Z',
+    },
+    {
+        id: 'sermon_agent',
+        name: 'Agente Gerador de Sermão',
+        description: 'Responsável por criar o sermão final com base no DNA, RAG e parâmetros do usuário.',
+        prompt: 'Você é um assistente de pregação teologicamente treinado. Seu objetivo é criar um sermão bem estruturado e biblicamente fundamentado. Use o DNA do pregador para definir o tom e estilo. Use os resultados do RAG como base de comentários. Siga a estrutura: Introdução, Pontos Principais (com sub-pontos) e Conclusão. Formate a saída em Markdown.',
+        updatedAt: '2025-06-05T15:30:00Z',
+    }
+]
+
+// --- Funções do Serviço Mock ---
+export const getDnaProfile = async (): Promise<DnaProfile> => new Promise((resolve) => setTimeout(() => resolve(mockDnaProfile), 500));
+export const updateDnaProfile = async (data: any): Promise<{ success: boolean }> => new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1000));
+export const generateSermon = async (params: any): Promise<Sermon> => { const newSermon = { ...mockSermonHistory[0], id: `gen-${Date.now()}`, createdAt: new Date().toISOString() }; return new Promise((resolve) => setTimeout(() => resolve(newSermon), 2000)); };
+export const getSermonHistory = async (): Promise<Sermon[]> => new Promise((resolve) => setTimeout(() => resolve(mockSermonHistory), 600));
+export const getAdminMetrics = async (): Promise<AdminMetrics> => new Promise((resolve) => setTimeout(() => resolve(mockAdminMetrics), 700));
+export const getAdminUsers = async (): Promise<AdminUser[]> => new Promise((resolve) => setTimeout(() => resolve(mockAdminUsers), 900));
+
+// NOVAS FUNÇÕES ADMIN
+export const getAgentPrompts = async (): Promise<AgentPrompt[]> => new Promise((resolve) => setTimeout(() => resolve(mockAgentPrompts), 500));
+export const updateAgentPrompt = async (id: string, prompt: string): Promise<{ success: boolean }> => { console.log(`MOCK API: Atualizando prompt ${id} com: ${prompt}`); return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1200));}
+
+
+Tarefa 2: Criar o Formulário de Edição de Prompt
+Ação: Crie o arquivo components/admin/prompt-editor-form.tsx.
+
+Caminho do Arquivo: components/admin/prompt-editor-form.tsx
+
+// components/admin/prompt-editor-form.tsx
+'use client';
+
+import { useState } from 'react';
+import { AgentPrompt, updateAgentPrompt } from '@/lib/mockApi';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
+
+interface PromptEditorFormProps {
+  promptData: AgentPrompt;
+}
+
+export default function PromptEditorForm({ promptData }: PromptEditorFormProps) {
+  const [prompt, setPrompt] = useState(promptData.prompt);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+    await updateAgentPrompt(promptData.id, prompt);
+    setIsLoading(false);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{promptData.name}</CardTitle>
+        <CardDescription>{promptData.description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor={promptData.id} className="sr-only">Prompt</Label>
+            <Textarea
+              id={promptData.id}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              rows={15}
+              className="font-mono text-sm"
+            />
+          </div>
+          <div className="flex justify-end">
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Salvar Prompt
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+Tarefa 3: Criar a Página "Gerenciar IA"
+Ação: Crie a estrutura app/(admin)/gerenciar-ia/page.tsx. Esta página buscará os prompts e os renderizará usando o novo formulário.
+
+Caminho do Arquivo: app/(admin)/gerenciar-ia/page.tsx
+
+// app/(admin)/gerenciar-ia/page.tsx
+import { getAgentPrompts } from "@/lib/mockApi";
+import PromptEditorForm from "@/components/admin/prompt-editor-form";
+
+export default async function ManageAiPage() {
+    const prompts = await getAgentPrompts();
+    
+    return (
+        <div className="space-y-8">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Gerenciar Agentes de IA</h1>
+                <p className="text-muted-foreground mt-2">
+                    Edite os prompts de sistema para refinar o comportamento e a qualidade das respostas da IA.
+                </p>
+            </div>
+
+            {prompts.map((prompt) => (
+                <PromptEditorForm key={prompt.id} promptData={prompt} />
+            ))}
+        </div>
+    );
+}
+
+Tarefa 4: Atualizar o Layout do Admin
+Ação: Edite o arquivo app/(admin)/layout.tsx para corrigir o link "Gerenciar IA".
+
+Caminho do Arquivo: app/(admin)/layout.tsx
+
+// app/(admin)/layout.tsx
+import { protect } from '@clerk/nextjs';
+import Link from 'next/link';
+import { ReactNode } from 'react';
+import { LayoutDashboard, Users, Bot, FileText, Home } from 'lucide-react';
+
+const AdminLayout = ({ children }: { children: ReactNode }) => {
+  return (
+    <protect role="org:admin" fallbackRedirectUrl="/gerar">
+      <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+        <div className="hidden border-r bg-muted/40 md:block">
+          <div className="flex h-full max-h-screen flex-col gap-2">
+            <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+              <Link href="/admin/dashboard" className="flex items-center gap-2 font-semibold">
+                <FileText className="h-6 w-6" />
+                <span className="">SermonAI Admin</span>
+              </Link>
+            </div>
+            <div className="flex-1">
+              <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+                <Link href="/admin/dashboard" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"><LayoutDashboard className="h-4 w-4" />Dashboard</Link>
+                <Link href="/admin/usuarios" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"><Users className="h-4 w-4" />Usuários</Link>
+                {/* ===== CORREÇÃO AQUI ===== */}
+                <Link href="/admin/gerenciar-ia" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"><Bot className="h-4 w-4" />Gerenciar IA</Link>
+              </nav>
+            </div>
+            <div className="mt-auto p-4 border-t">
+               <Link href="/gerar" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"><Home className="h-4 w-4" />Voltar para App</Link>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col">
+          <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+            {children}
+          </main>
+        </div>
+      </div>
+    </protect>
+  );
+};
+
+export default AdminLayout;
