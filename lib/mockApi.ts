@@ -2,14 +2,14 @@
 
 // --- Interfaces de Dados ---
 export interface DnaProfile {
-  type: 'padrão' | 'customizado';
+  type: 'customizado';
   name: string;
-  customAttributes?: {
-    style?: string;
-    tone?: string;
-    vocabulary?: string[];
+  customAttributes: {
+    style: string;
+    tone: string;
+    vocabulary: string[];
   };
-  calculatedPpm?: number;
+  calculatedPpm: number;
 }
 
 export interface Sermon {
@@ -29,7 +29,7 @@ export interface AdminUser {
   id: string;
   name: string;
   email: string;
-  role: 'free' | 'basic' | 'pro' | 'admin';
+  role: string;
   isActive: boolean;
   createdAt: string;
 }
@@ -42,6 +42,15 @@ export interface AdminMetrics {
     standard: number;
     custom: number;
   };
+}
+
+// NOVA INTERFACE
+export interface AgentPrompt {
+  id: 'dna_agent' | 'sermon_agent';
+  name: string;
+  description: string;
+  prompt: string;
+  updatedAt: string;
 }
 
 // --- Dados Mock ---
@@ -60,156 +69,106 @@ const mockSermonHistory: Sermon[] = [
   {
     id: 'sermon-001',
     title: 'A Coragem para Recomeçar',
-    content: `# A Coragem para Recomeçar
-
-## Introdução
-Todos nós enfrentamos momentos em que precisamos recomeçar. Seja após uma queda, um fracasso ou simplesmente uma mudança de direção na vida.
-
-## Desenvolvimento
-1. **O poder do recomeço está em Deus**
-2. **Não olhe para trás com arrependimento**
-3. **Confie no plano divino para sua vida**
-
-## Conclusão
-Deus sempre nos dá uma nova oportunidade. O importante é ter coragem para dar o primeiro passo.`,
-    enrichmentSuggestions: `* Ilustração: Use a metáfora de uma árvore podada que cresce mais forte
-* Dinâmica: Peça para as pessoas escreverem algo que querem recomeçar
-* Versículo chave: Lamentações 3:22-23`,
-    parameters: { theme: 'Recomeço', purpose: 'Inspirar', duration: 20 },
-    createdAt: '2025-01-06T10:00:00Z',
+    content: `# A Coragem para Recomeçar\n\nTexto bíblico aqui...`,
+    enrichmentSuggestions: `* Ilustração sobre recomeços\n* Testemunho pessoal`,
+    parameters: {
+      theme: 'Recomeço',
+      purpose: 'Inspirar',
+      duration: 20
+    },
+    createdAt: '2025-06-05T10:00:00Z',
   },
   {
     id: 'sermon-002',
     title: 'Vivendo em Comunidade',
-    content: `# Vivendo em Comunidade
-
-## Introdução
-Deus não nos criou para viver isolados. A comunidade é essencial para nosso crescimento espiritual.
-
-## Desenvolvimento
-1. **A importância do amor fraternal**
-2. **Como resolver conflitos com amor**
-3. **Edificando uns aos outros**
-
-## Conclusão
-Quando vivemos em verdadeira comunidade, refletimos o coração de Deus.`,
-    enrichmentSuggestions: `* Dinâmica: Peça para as pessoas se cumprimentarem e orarem umas pelas outras
-* Ilustração: Use o exemplo de uma fogueira - as brasas juntas mantêm o fogo aceso
-* Versículo chave: Hebreus 10:24-25`,
-    parameters: { theme: 'Comunidade', purpose: 'Ensinar', duration: 30 },
-    createdAt: '2025-01-05T11:30:00Z',
-  },
-  {
-    id: 'sermon-003',
-    title: 'O Propósito na Espera',
-    content: `# O Propósito na Espera
-
-## Introdução
-A espera pode ser um dos momentos mais difíceis da vida cristã. Mas Deus tem um propósito em cada período de espera.
-
-## Desenvolvimento
-1. **Deus trabalha durante nossa espera**
-2. **A espera desenvolve nosso caráter**
-3. **Confiar no tempo de Deus**
-
-## Conclusão
-Na espera, aprendemos a depender completamente de Deus e descobrimos Sua fidelidade.`,
-    enrichmentSuggestions: `* Versículo Chave: Isaías 40:31
-* Ilustração: Use o exemplo de uma borboleta no casulo
-* Oração: Ore pelos que estão em período de espera`,
-    parameters: { theme: 'Paciência', purpose: 'Consolar', duration: 25 },
-    createdAt: '2025-01-04T09:45:00Z',
+    content: `# Vivendo em Comunidade\n\nTexto bíblico aqui...`,
+    enrichmentSuggestions: `* Dinâmica de grupo\n* Exemplo prático`,
+    parameters: {
+      theme: 'Comunidade',
+      purpose: 'Ensinar',
+      duration: 30
+    },
+    createdAt: '2025-05-28T11:30:00Z',
   },
 ];
 
 const mockAdminUsers: AdminUser[] = [
   {
-    id: 'admin-001',
-    name: 'Admin Teste',
-    email: 'admin@teste.com',
+    id: 'user_2iabcde',
+    name: 'Haniel Levi',
+    email: 'haniel.levi@example.com',
     role: 'admin',
     isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
+    createdAt: '2025-04-10T08:00:00Z'
   },
   {
-    id: 'user-001',
-    name: 'User Free',
-    email: 'free@teste.com',
-    role: 'free',
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-  },
-  {
-    id: 'user-002',
-    name: 'User Basic',
-    email: 'basic@teste.com',
-    role: 'basic',
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-  },
-  {
-    id: 'user-003',
-    name: 'User Pro',
-    email: 'pro@teste.com',
+    id: 'user_2ifghij',
+    name: 'Maria Silva',
+    email: 'maria.silva@example.com',
     role: 'pro',
     isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
+    createdAt: '2025-05-20T14:00:00Z'
   },
 ];
 
 const mockAdminMetrics: AdminMetrics = {
-  totalUsers: 150,
-  totalSermons: 520,
-  activeSubscriptions: 85,
+  totalUsers: 138,
+  totalSermons: 452,
+  activeSubscriptions: 73,
   dnaUsage: {
-    standard: 60,
-    custom: 40,
+    standard: 65,
+    custom: 73
   },
 };
 
+// NOVOS DADOS
+const mockAgentPrompts: AgentPrompt[] = [
+  {
+    id: 'dna_agent',
+    name: 'Agente Criador de DNA',
+    description: 'Responsável por analisar os materiais do usuário e extrair seu perfil de pregador.',
+    prompt: 'Você é um especialista em análise de estilo e homilética. Analise o texto fornecido e extraia os seguintes atributos em formato JSON: estilo de pregação (expositivo, temático), tom (inspirador, confrontador), e um array de 5 a 10 palavras-chave mais utilizadas.',
+    updatedAt: '2025-06-01T12:00:00Z',
+  },
+  {
+    id: 'sermon_agent',
+    name: 'Agente Gerador de Sermão',
+    description: 'Responsável por criar o sermão final com base no DNA, RAG e parâmetros do usuário.',
+    prompt: 'Você é um assistente de pregação teologicamente treinado. Seu objetivo é criar um sermão bem estruturado e biblicamente fundamentado. Use o DNA do pregador para definir o tom e estilo. Use os resultados do RAG como base de comentários. Siga a estrutura: Introdução, Pontos Principais (com sub-pontos) e Conclusão. Formate a saída em Markdown.',
+    updatedAt: '2025-06-05T15:30:00Z',
+  }
+];
+
 // --- Funções do Serviço Mock ---
+export const getDnaProfile = async (): Promise<DnaProfile> => 
+  new Promise((resolve) => setTimeout(() => resolve(mockDnaProfile), 500));
 
-export const getDnaProfile = async (): Promise<DnaProfile> => {
-  console.log('MOCK API: Buscando perfil de DNA...');
-  return new Promise((resolve) => setTimeout(() => resolve(mockDnaProfile), 1000));
-};
-
-export const updateDnaProfile = async (data: any): Promise<{ success: boolean }> => {
-  console.log('MOCK API: Atualizando perfil de DNA com os dados:', data);
-  return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1500));
-};
+export const updateDnaProfile = async (data: any): Promise<{ success: boolean }> => 
+  new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1000));
 
 export const generateSermon = async (params: any): Promise<Sermon> => {
-  console.log('MOCK API: Gerando sermão com parâmetros:', params);
-  // Retorna o primeiro item do histórico como se tivesse sido gerado agora
-  const newSermon = { ...mockSermonHistory[0], id: `gen-${Date.now()}`, createdAt: new Date().toISOString() };
-  return new Promise((resolve) => setTimeout(() => resolve(newSermon), 3000));
+  const newSermon = {
+    ...mockSermonHistory[0],
+    id: `gen-${Date.now()}`,
+    createdAt: new Date().toISOString()
+  };
+  return new Promise((resolve) => setTimeout(() => resolve(newSermon), 2000));
 };
 
-export const getSermonHistory = async (): Promise<Sermon[]> => {
-  console.log('MOCK API: Buscando histórico de sermões...');
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockSermonHistory);
-    }, 600);
-  });
-};
+export const getSermonHistory = async (): Promise<Sermon[]> => 
+  new Promise((resolve) => setTimeout(() => resolve(mockSermonHistory), 600));
+
+export const getAdminMetrics = async (): Promise<AdminMetrics> => 
+  new Promise((resolve) => setTimeout(() => resolve(mockAdminMetrics), 700));
+
+export const getAdminUsers = async (): Promise<AdminUser[]> => 
+  new Promise((resolve) => setTimeout(() => resolve(mockAdminUsers), 900));
 
 // NOVAS FUNÇÕES ADMIN
-export const getAdminMetrics = async (): Promise<AdminMetrics> => {
-  console.log('MOCK API: Buscando métricas admin...');
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockAdminMetrics);
-    }, 700);
-  });
-};
+export const getAgentPrompts = async (): Promise<AgentPrompt[]> => 
+  new Promise((resolve) => setTimeout(() => resolve(mockAgentPrompts), 500));
 
-export const getAdminUsers = async (): Promise<AdminUser[]> => {
-  console.log('MOCK API: Buscando usuários admin...');
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockAdminUsers);
-    }, 900);
-  });
+export const updateAgentPrompt = async (id: string, prompt: string): Promise<{ success: boolean }> => {
+  console.log(`MOCK API: Atualizando prompt ${id} com: ${prompt}`);
+  return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1200));
 };

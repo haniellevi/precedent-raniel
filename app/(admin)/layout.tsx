@@ -32,9 +32,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
                 <Users className="h-4 w-4" />
                 Usuários
               </Link>
-              <Link href="#" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+              <Link href="/admin/gerenciar-ia" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
                 <Bot className="h-4 w-4" />
-                Gerenciar IA (futuro)
+                Gerenciar IA
               </Link>
             </nav>
           </div>
