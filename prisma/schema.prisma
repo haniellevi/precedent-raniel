@@ -1,7 +1,4 @@
-
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,78 +8,52 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  free
+  basic
+  pro
+  admin
+}
+
 model User {
-  id        String   @id @default(cuid())
-  clerkId   String   @unique
-  email     String   @unique
-  firstName String?
-  lastName  String?
-  imageUrl  String?
-  role      UserRole @default(USER)
+  clerkUserId String @id @unique
+  email String @unique
+  name  String?
+  role  UserRole @default(free)
+  isActive Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relacionamentos
   dnaProfile DnaProfile?
   sermons    Sermon[]
-
-  @@map("users")
 }
 
 model DnaProfile {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  preachingStyle    String?
-  favoriteTopics    String[]
-  targetAudience    String?
-  theologicalStyle  String?
-  preferredDuration Int?     // em minutos
-  languageStyle     String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id        String   @id @default(cuid())
+  userId    String   @unique // Um usuário tem apenas um perfil de DNA
+  user      User     @relation(fields: [userId], references: [clerkUserId], onDelete: Cascade)
 
-  // Relacionamentos
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   @default("Meu Perfil de Pregação")
+  style     String?  // Ex: Expositivo, Temático
+  tone      String?  // Ex: Inspirador, Confrontador
 
-  @@map("dna_profiles")
+  // Este campo pode ser usado para armazenar dados extra no futuro
+  customAttributes Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Sermon {
-  id         String      @id @default(cuid())
-  title      String
-  content    String
-  parameters Json // Armazena os parâmetros usados na geração
-  status     SermonStatus @default(COMPLETED)
-  userId     String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-
-  // Relacionamentos
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sermons")
-}
-
-model AdminPrompt {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?
-  content     String
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("admin_prompts")
-}
-
-enum UserRole {
-  USER
-  ADMIN
-}
-
-enum SermonStatus {
-  PENDING
-  GENERATING
-  COMPLETED
-  ERROR
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [clerkUserId], onDelete: Cascade)
+  title String
+  content String @db.Text
+  parameters Json // Armazena os parâmetros usados para a geração
+  enrichmentSuggestions String? @db.Text
+  qualityAssessment     Json?
+  planType UserRole
+  createdAt DateTime @default(now())
+  @@index([userId])
 }
