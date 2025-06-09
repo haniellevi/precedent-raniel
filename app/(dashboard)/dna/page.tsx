@@ -1,4 +1,3 @@
-
 // app/(dashboard)/dna/page.tsx
 import { getDnaProfile } from '@/lib/mockApi';
 import DnaForm from '@/components/dna-form';
