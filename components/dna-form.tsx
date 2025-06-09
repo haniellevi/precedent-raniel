@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { DnaProfile } from '@/lib/mockApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,39 +15,36 @@ interface DnaFormProps {
 }
 
 export default function DnaForm({ initialProfile }: DnaFormProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Estados para controlar os campos do formulário
   const [style, setStyle] = useState(initialProfile.customAttributes?.style || 'Expositivo');
   const [tone, setTone] = useState(initialProfile.customAttributes?.tone || 'Inspirador');
-  const [sermonText, setSermonText] = useState('');
-  const [youtubeUrl, setYoutubeUrl] = useState('');
-
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsLoading(true);
     setIsSuccess(false);
 
-    try {
-        const formData = { style, tone, sermonText, youtubeUrl };
-        const response = await fetch('/api/dna', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData),
-        });
+    startTransition(async () => {
+      const formData = new FormData(event.currentTarget);
+      const data = {
+        style: formData.get('style'),
+        tone: formData.get('tone'),
+        sermonText: formData.get('sermon-content'),
+        youtubeUrl: formData.get('video-url'),
+      };
 
-        if (!response.ok) throw new Error('Falha ao salvar o DNA');
+      const response = await fetch('/api/dna', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+      });
 
+      if (response.ok) {
         setIsSuccess(true);
-        setTimeout(() => setIsSuccess(false), 4000);
-
-    } catch (error) {
-        console.error("Erro ao submeter o formulário de DNA:", error);
-    } finally {
-        setIsLoading(false);
-    }
+        setTimeout(() => setIsSuccess(false), 3000);
+      }
+    });
   };
 
   return (
@@ -86,33 +83,18 @@ export default function DnaForm({ initialProfile }: DnaFormProps) {
               </Select>
             </div>
           </div>
-
           <div>
-            <Label htmlFor="sermon-content">Fonte de Dados 1: Texto de Sermões</Label>
-            <Textarea 
-              id="sermon-content" 
-              name="sermon-content"
-              value={sermonText}
-              onChange={(e) => setSermonText(e.target.value)}
-              placeholder="Cole aqui o texto de um ou mais sermões para análise..." 
-              rows={8} 
-            />
+            <Label htmlFor="sermon-content">Fonte de Dados 1: Texto de Sermões (Opcional)</Label>
+            <Textarea id="sermon-content" name="sermon-content" placeholder="Cole aqui o texto de um ou mais sermões para análise..." rows={8} />
           </div>
           <div>
-            <Label htmlFor="video-url">Fonte de Dados 2: URL de Vídeo do YouTube</Label>
-            <Input 
-              id="video-url" 
-              name="video-url"
-              value={youtubeUrl}
-              onChange={(e) => setYoutubeUrl(e.target.value)}
-              placeholder="https://youtube.com/watch?v=..." 
-            />
+            <Label htmlFor="video-url">Fonte de Dados 2: URL de Vídeo do YouTube (Opcional)</Label>
+            <Input id="video-url" name="video-url" placeholder="https://youtube.com/watch?v=..." />
           </div>
-
           <div className="flex justify-end items-center gap-4 pt-4">
             {isSuccess && <span className="text-sm text-green-600 flex items-center"><CheckCircle className="mr-2 h-4 w-4" />Salvo!</span>}
-            <Button type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" disabled={isPending}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Analisar e Salvar DNA
             </Button>
           </div>

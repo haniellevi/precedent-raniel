@@ -6,26 +6,19 @@ async function getDnaData(): Promise<DnaProfile> {
   const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
   const res = await fetch(`${baseUrl}/api/dna`, { cache: 'no-store' });
   if (!res.ok) {
-    // Retorna um perfil padrão em caso de erro para não quebrar a página
-    return {
-        type: 'customizado',
-        name: 'Meu Perfil de Pregação',
-        customAttributes: { style: 'Expositivo', tone: 'Inspirador', vocabulary: []},
-        calculatedPpm: 120,
-    };
+    return { type: 'customizado', name: 'Meu Perfil', customAttributes: { style: 'Expositivo', tone: 'Inspirador', vocabulary: []}, calculatedPpm: 120 };
   }
   return res.json();
 }
 
 export default async function DnaPage() {
   const dnaProfile = await getDnaData();
-
   return (
     <div className="space-y-4">
       <div className="text-center">
         <h1 className="text-3xl font-bold tracking-tight">Meu DNA de Pregador</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto mt-2">
-          Esta é a sua central de personalização. Configure os atributos abaixo para que a inteligência artificial aprenda a sua voz e estilo únicos.
+          Esta é a sua central de personalização. Configure os atributos abaixo para que a IA aprenda o seu estilo.
         </p>
       </div>
       <div className="pt-4">
