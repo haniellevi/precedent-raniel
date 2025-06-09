@@ -1,7 +1,4 @@
 import { ReactNode } from 'react';
-import { auth } from '@clerk/nextjs/server';
-import { notFound } from 'next/navigation';
-import MainHeader from '@/components/layout/main-header';
 
 export default async function DashboardLayout({
   children,
