@@ -1,0 +1,212 @@
+Olá! Por favor, execute as seguintes tarefas para construir a camada de API do projeto, substituindo as chamadas diretas ao serviço de mock no frontend.
+
+Tarefa 1: Atualizar o Serviço de Mock para ser Usado pelo Backend
+Ação: Substitua o conteúdo do arquivo lib/mockApi.ts. Vamos simplificá-lo para apenas exportar os dados brutos. A lógica de delay será agora tratada pelos Route Handlers.
+
+Caminho do Arquivo: lib/mockApi.ts
+
+// lib/mockApi.ts - ATUALIZADO PARA EXPORTAR APENAS DADOS
+
+// --- Interfaces ---
+export interface DnaProfile { type: 'padrao' | 'customizado'; name: string; customAttributes?: { style: string; tone: string; vocabulary: string[]; }; calculatedPpm: number; }
+export interface Sermon { id: string; title: string; content: string; enrichmentSuggestions: string; parameters: { theme: string; purpose: string; duration: number; }; createdAt: string; }
+export interface AdminUser { id: string; name: string; email: string; role: 'free' | 'basic' | 'pro' | 'admin'; isActive: boolean; createdAt: string; }
+export interface AdminMetrics { totalUsers: number; totalSermons: number; activeSubscriptions: number; dnaUsage: { standard: number; custom: number; }; }
+export interface AgentPrompt { id: 'dna_agent' | 'sermon_agent'; name: string; description: string; prompt: string; updatedAt: string; }
+
+// --- Exportação de Dados Mock ---
+export const mockDnaProfileData: DnaProfile = { type: 'customizado', name: 'Meu DNA Personalizado', customAttributes: { style: 'Expositivo e Prático', tone: 'Inspirador e Encorajador', vocabulary: ['graça', 'redenção', 'propósito', 'comunidade'], }, calculatedPpm: 120, };
+export const mockSermonHistoryData: Sermon[] = [ { id: 'sermon-001', title: 'A Coragem para Recomeçar', content: `# A Coragem para Recomeçar...`, enrichmentSuggestions: `* Ilustração...`, parameters: { theme: 'Recomeço', purpose: 'Inspirar', duration: 20 }, createdAt: '2025-06-05T10:00:00Z', }, { id: 'sermon-002', title: 'Vivendo em Comunidade', content: `# Vivendo em Comunidade...`, enrichmentSuggestions: `* Dinâmica...`, parameters: { theme: 'Comunidade', purpose: 'Ensinar', duration: 30 }, createdAt: '2025-05-28T11:30:00Z', }, ];
+export const mockAdminUsersData: AdminUser[] = [ { id: 'user_2iabcde', name: 'Haniel Levi', email: 'haniel.levi@example.com', role: 'admin', isActive: true, createdAt: '2025-04-10T08:00:00Z'}, { id: 'user_2ifghij', name: 'Maria Silva', email: 'maria.silva@example.com', role: 'pro', isActive: true, createdAt: '2025-05-20T14:00:00Z'}, ];
+export const mockAdminMetricsData: AdminMetrics = { totalUsers: 138, totalSermons: 452, activeSubscriptions: 73, dnaUsage: { standard: 65, custom: 73 }, };
+export const mockAgentPromptsData: AgentPrompt[] = [ { id: 'dna_agent', name: 'Agente Criador de DNA', description: 'Responsável por analisar os materiais do usuário e extrair seu perfil de pregador.', prompt: 'Você é um especialista em análise de estilo e homilética...', updatedAt: '2025-06-01T12:00:00Z', }, { id: 'sermon_agent', name: 'Agente Gerador de Sermão', description: 'Responsável por criar o sermão final...', prompt: 'Você é um assistente de pregação teologicamente treinado...', updatedAt: '2025-06-05T15:30:00Z', } ];
+
+Tarefa 2: Criar os Route Handlers da API
+Ação: Crie a seguinte estrutura de pastas e arquivos dentro de app/api/.
+
+1. Crie o arquivo: app/api/dna/route.ts
+
+// app/api/dna/route.ts
+import { NextResponse } from 'next/server';
+import { mockDnaProfileData } from '@/lib/mockApi';
+
+// Simula a busca do perfil de DNA
+export async function GET() {
+  await new Promise(resolve => setTimeout(resolve, 1000)); // Simula latência
+  return NextResponse.json(mockDnaProfileData);
+}
+
+// Simula a atualização do perfil de DNA
+export async function POST(request: Request) {
+  const data = await request.json();
+  console.log('API RECEBEU DADOS PARA ATUALIZAR DNA:', data);
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  return NextResponse.json({ success: true });
+}
+
+2. Crie o arquivo: app/api/sermons/route.ts
+
+// app/api/sermons/route.ts
+import { NextResponse } from 'next/server';
+import { mockSermonHistoryData } from '@/lib/mockApi';
+
+// Simula a geração de um sermão
+export async function POST(request: Request) {
+  const params = await request.json();
+  console.log('API RECEBEU DADOS PARA GERAR SERMÃO:', params);
+  await new Promise(resolve => setTimeout(resolve, 2500));
+  const newSermon = { ...mockSermonHistoryData[0], id: `gen-${Date.now()}` };
+  return NextResponse.json(newSermon);
+}
+
+3. Crie o arquivo: app/api/sermons/history/route.ts
+
+// app/api/sermons/history/route.ts
+import { NextResponse } from 'next/server';
+import { mockSermonHistoryData } from '@/lib/mockApi';
+
+// Simula a busca do histórico de sermões
+export async function GET() {
+  await new Promise(resolve => setTimeout(resolve, 800));
+  return NextResponse.json(mockSermonHistoryData);
+}
+
+Tarefa 3: Atualizar os Componentes do Frontend para Usar a API
+Ação: Modifique os componentes de cliente para que eles façam chamadas fetch para as novas rotas de API em vez de importar as funções do mock diretamente.
+
+1. Edite o arquivo: components/dna-form.tsx
+
+Remova o import de updateDnaProfile do mock.
+
+Altere a função handleSubmit para usar fetch.
+
+// components/dna-form.tsx
+'use client';
+
+import { useState } from 'react';
+import { DnaProfile } from '@/lib/mockApi'; // Apenas a interface é necessária
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { UploadCloud, Youtube, Loader2, CheckCircle } from 'lucide-react';
+
+interface DnaFormProps {
+  initialProfile: DnaProfile;
+}
+
+export default function DnaForm({ initialProfile }: DnaFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  // ... (restante dos useStates)
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setIsSuccess(false);
+
+    // ... (lógica para pegar dados do form)
+
+    // === INÍCIO DA ALTERAÇÃO ===
+    await fetch('/api/dna', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ /* ...seus dados do form... */ }),
+    });
+    // === FIM DA ALTERAÇÃO ===
+
+    setIsLoading(false);
+    setIsSuccess(true);
+    setTimeout(() => setIsSuccess(false), 4000);
+  };
+
+  return ( /* ... O JSX do formulário permanece o mesmo ... */ );
+}
+
+2. Edite o arquivo: components/sermon-generation-form.tsx
+
+Remova o import de generateSermon.
+
+Altere a função handleSubmit para usar fetch.
+
+// components/sermon-generation-form.tsx
+'use client';
+
+import { useState } from 'react';
+// ... (outros imports)
+import { Loader2 } from 'lucide-react';
+import { Sermon } from '@/lib/mockApi'; // Importe a interface
+
+interface SermonGenerationFormProps {
+  onSermonGenerated: (sermon: Sermon) => void;
+}
+
+export default function SermonGenerationForm({ onSermonGenerated }: SermonGenerationFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+
+    const formData = new FormData(event.currentTarget);
+    const params = Object.fromEntries(formData.entries());
+    
+    // === INÍCIO DA ALTERAÇÃO ===
+    const response = await fetch('/api/sermons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+    });
+    const sermon = await response.json();
+    // === FIM DA ALTERAÇÃO ===
+    
+    onSermonGenerated(sermon);
+    setIsLoading(false);
+  };
+
+  return ( /* ... O JSX do formulário permanece o mesmo ... */ );
+}
+
+Tarefa 4: Atualizar as Páginas (Server Components) para Usar a API
+Ação: Modifique as páginas que buscam dados para que elas façam chamadas fetch para as novas rotas. Isso é crucial para o padrão do App Router.
+
+1. Edite o arquivo: app/(dashboard)/dna/page.tsx
+
+// app/(dashboard)/dna/page.tsx
+import DnaForm from '@/components/dna-form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DnaProfile } from '@/lib/mockApi';
+
+// Função para buscar dados no servidor
+async function getDnaData(): Promise<DnaProfile> {
+  // A URL deve ser absoluta no servidor
+  const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/dna`, { cache: 'no-store' });
+  return res.json();
+}
+
+export default async function DnaPage() {
+  const dnaProfile = await getDnaData();
+
+  return ( /* ... O JSX da página permanece o mesmo ... */ );
+}
+
+2. Edite o arquivo: app/(dashboard)/historico/page.tsx
+
+// app/(dashboard)/historico/page.tsx
+import SermonHistoryList from '@/components/sermon-history-list';
+import { Suspense } from 'react';
+import { Sermon } from '@/lib/mockApi';
+
+// ... (componente LoadingSkeleton permanece o mesmo) ...
+
+async function HistoryData() {
+  const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/sermons/history`, { cache: 'no-store' });
+  const sermons: Sermon[] = await res.json();
+  return <SermonHistoryList sermons={sermons} />;
+}
+
+export default function HistoryPage() {
+    return ( /* ... O JSX da página permanece o mesmo ... */ );
+}
