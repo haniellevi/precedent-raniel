@@ -1,72 +1,20 @@
-// app/(dashboard)/layout.tsx
 import { ReactNode } from 'react';
-import { notFound } from 'next/navigation';
-import { UserButton } from '@clerk/nextjs';
-import Link from 'next/link';
-import Image from 'next/image';
-import Footer from '@/components/layout/footer'; // 1. Importe o novo componente
+import Footer from '@/components/layout/footer';
+import MainHeader from '@/components/layout/main-header';
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-
-  // A lógica de autenticação do Clerk já deve estar aqui
-  // ...
-
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-          <div className="flex gap-6 md:gap-10">
-            <Link href="/" className="flex items-center space-x-2">
-              <Image
-                src="/logo.png" // Verifique o caminho do seu logo
-                alt="SermonAI Logo"
-                width={24}
-                height={24}
-                className="h-6 w-6"
-              />
-              <span className="inline-block font-bold">SermonAI</span>
-            </Link>
-          </div>
-          <div className="flex flex-1 items-center justify-end space-x-4">
-            <nav className="flex items-center space-x-6 text-sm font-medium">
-              <Link
-                href="/gerar"
-                className="transition-colors hover:text-foreground/80 text-muted-foreground"
-              >
-                Gerar Sermão
-              </Link>
-              <Link
-                href="/historico"
-                className="transition-colors hover:text-foreground/80 text-muted-foreground"
-              >
-                Histórico
-              </Link>
-              <Link
-                href="/dna"
-                className="transition-colors hover:text-foreground/80 text-muted-foreground"
-              >
-                Meu DNA
-              </Link>
-            </nav>
-            <div className="flex items-center space-x-4">
-               <UserButton afterSignOutUrl="/" />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Conteúdo principal da página */}
-      <main className="container flex-1 items-start py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+    <div className="relative flex min-h-screen flex-col bg-background">
+      <MainHeader />
+      <main className="flex-1">
+        <div className="container py-8">
           {children}
         </div>
       </main>
-
-      {/* 2. Adicione o componente Footer aqui */}
       <Footer />
     </div>
   );
