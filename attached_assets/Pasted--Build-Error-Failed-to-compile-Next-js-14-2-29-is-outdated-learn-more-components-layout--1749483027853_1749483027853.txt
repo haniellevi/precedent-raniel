@@ -1,0 +1,110 @@
+
+Build Error
+Failed to compile
+
+Next.js (14.2.29) is outdated (learn more)
+./components/layout/footer.tsx
+Error: 
+  × the name `Footer` is defined multiple times
+    ╭─[/home/runner/workspace/components/layout/footer.tsx:1:1]
+  1 │ import { BuyMeACoffee } from "../shared/icons";
+  2 │ 
+  3 │ export default function Footer() {
+    ·                         ───┬──
+    ·                            ╰── previous definition of `Footer` here
+  4 │   return (
+  5 │     <div className="absolute w-full py-5 text-center">
+  6 │       <p className="text-gray-500">
+  7 │         A project by{" "}
+  8 │         <a
+  9 │           className="font-semibold text-gray-600 underline-offset-4 transition-colors hover:underline"
+ 10 │           href="https://twitter.com/steventey"
+ 11 │           target="_blank"
+ 12 │           rel="noopener noreferrer"
+ 13 │         >
+ 14 │           Steven Tey
+ 15 │         </a>
+ 16 │       </p>
+ 17 │       <a
+ 18 │         href="https://www.buymeacoffee.com/steventey"
+ 19 │         target="_blank"
+ 20 │         rel="noopener noreferrer"
+ 21 │         className="mx-auto mt-2 flex max-w-fit items-center justify-center space-x-2 rounded-lg border border-gray-200 bg-white px-6 py-2 transition-all duration-75 hover:scale-105"
+ 22 │       >
+ 23 │         <BuyMeACoffee className="h-6 w-6" />
+ 24 │         <p className="font-medium text-gray-600">Buy me a coffee</p>
+ 25 │       </a>
+ 26 │     </div>
+ 27 │   );
+ 28 │ }
+ 29 │ // components/layout/footer.tsx
+ 30 │ import React from 'react';
+ 31 │ 
+ 32 │ export default function Footer() {
+    ·                         ───┬──
+    ·                            ╰── `Footer` redefined here
+ 33 │   const currentYear = new Date().getFullYear();
+ 34 │ 
+ 35 │   return (
+    ╰────
+
+  × the name `default` is exported multiple times
+    ╭─[/home/runner/workspace/components/layout/footer.tsx:1:1]
+  1 │     import { BuyMeACoffee } from "../shared/icons";
+  2 │     
+  3 │ ╭─▶ export default function Footer() {
+  4 │ │     return (
+  5 │ │       <div className="absolute w-full py-5 text-center">
+  6 │ │         <p className="text-gray-500">
+  7 │ │           A project by{" "}
+  8 │ │           <a
+  9 │ │             className="font-semibold text-gray-600 underline-offset-4 transition-colors hover:underline"
+ 10 │ │             href="https://twitter.com/steventey"
+ 11 │ │             target="_blank"
+ 12 │ │             rel="noopener noreferrer"
+ 13 │ │           >
+ 14 │ │             Steven Tey
+ 15 │ │           </a>
+ 16 │ │         </p>
+ 17 │ │         <a
+ 18 │ │           href="https://www.buymeacoffee.com/steventey"
+ 19 │ │           target="_blank"
+ 20 │ │           rel="noopener noreferrer"
+ 21 │ │           className="mx-auto mt-2 flex max-w-fit items-center justify-center space-x-2 rounded-lg border border-gray-200 bg-white px-6 py-2 transition-all duration-75 hover:scale-105"
+ 22 │ │         >
+ 23 │ │           <BuyMeACoffee className="h-6 w-6" />
+ 24 │ │           <p className="font-medium text-gray-600">Buy me a coffee</p>
+ 25 │ │         </a>
+ 26 │ │       </div>
+ 27 │ │     );
+ 28 │ ├─▶ }
+    · ╰──── previous exported here
+ 29 │     // components/layout/footer.tsx
+ 30 │     import React from 'react';
+ 31 │     
+ 32 │ ╭─▶ export default function Footer() {
+ 33 │ │     const currentYear = new Date().getFullYear();
+ 34 │ │   
+ 35 │ │     return (
+ 36 │ │       <div className="absolute w-full py-5 text-center bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+ 37 │ │         <p className="text-sm text-gray-500 dark:text-gray-400">
+ 38 │ │           © {currentYear} SermonAI. Todos os direitos reservados. Desenvolvido por{' '}
+ 39 │ │           <a
+ 40 │ │             className="font-medium text-gray-800 dark:text-gray-200 underline transition-colors"
+ 41 │ │             href="https://seusite.com" // Coloque seu site ou GitHub aqui
+ 42 │ │             target="_blank"
+ 43 │ │             rel="noopener noreferrer"
+ 44 │ │           >
+ 45 │ │             Seu Nome ou Empresa
+ 46 │ │           </a>
+ 47 │ │           .
+ 48 │ │         </p>
+ 49 │ │       </div>
+ 50 │ │     );
+ 51 │ ├─▶ }
+    · ╰──── exported more than once
+    ╰────
+
+Error: 
+  ☞ Exported identifiers must be unique
+This error occurred during the build process and can only be dismissed by fixing the error.
