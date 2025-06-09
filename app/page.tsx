@@ -1,79 +1,82 @@
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { Mic, FileText, Zap } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] text-center space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-          SermonAI
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-[600px]">
-          Crie sermões personalizados com inteligência artificial que aprende seu estilo único de pregação.
-        </p>
-      </div>
-
-      <SignedOut>
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button asChild size="lg">
-              <Link href="/sign-up">Começar Agora</Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-16 lg:py-24">
+        <div className="text-center max-w-4xl mx-auto">
+          <h1 className="text-4xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-6">
+            Crie Sermões com{" "}
+            <span className="text-blue-600">Inteligência Artificial</span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Transforme a sua pregação com IA personalizada. Defina o seu DNA de pregador 
+            e gere sermões únicos que refletem o seu estilo e teologia.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
+              <Link href="/dna">Começar Agora</Link>
             </Button>
-            <Button variant="outline" size="lg" asChild>
-              <Link href="/sign-in">Fazer Login</Link>
+            <Button variant="outline" size="lg">
+              Saiba Mais
             </Button>
           </div>
         </div>
-      </SignedOut>
+      </section>
 
-      <SignedIn>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
-          <Card>
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle>Gerar Sermão</CardTitle>
+              <Mic className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <CardTitle>DNA Personalizado</CardTitle>
               <CardDescription>
-                Crie um novo sermão com base no seu DNA de pregação
+                Configure o seu perfil de pregação único com base no seu estilo e teologia.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button asChild className="w-full">
-                <Link href="/gerar">Criar Sermão</Link>
-              </Button>
-            </CardContent>
           </Card>
 
-          <Card>
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle>Meu DNA</CardTitle>
+              <FileText className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <CardTitle>Geração Inteligente</CardTitle>
               <CardDescription>
-                Configure seu estilo e personalidade de pregação
+                IA avançada que gera sermões alinhados com a sua voz e mensagem.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/dna">Configurar DNA</Link>
-              </Button>
-            </CardContent>
           </Card>
 
-          <Card>
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle>Histórico</CardTitle>
+              <Zap className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <CardTitle>Resultados Rápidos</CardTitle>
               <CardDescription>
-                Veja todos os sermões que você já gerou
+                Sermões completos em minutos, prontos para impactar vidas.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/historico">Ver Histórico</Link>
-              </Button>
-            </CardContent>
           </Card>
         </div>
-      </SignedIn>
+      </section>
+
+      {/* CTA Section */}
+      <section className="container mx-auto px-4 py-16 text-center">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4">
+            Pronto para Transformar a Sua Pregação?
+          </h2>
+          <p className="text-xl text-gray-600 mb-8">
+            Junte-se a centenas de pregadores que já estão usando IA para criar sermões impactantes.
+          </p>
+          <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
+            <Link href="/sign-up">Comece Gratuitamente</Link>
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }

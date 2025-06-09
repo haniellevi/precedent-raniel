@@ -1,42 +1,42 @@
+
 'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Zap } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { generateSermon, SermonGenerationRequest } from '@/lib/mockApi';
+import { Loader2, Zap } from 'lucide-react';
+import { Sermon } from '@/lib/mockApi';
 
 interface SermonGenerationFormProps {
-  onSermonGenerated: (sermon: any) => void;
-  userId: string;
+  onSermonGenerated: (sermon: Sermon) => void;
 }
 
-export default function SermonGenerationForm({ onSermonGenerated, userId }: SermonGenerationFormProps) {
+export default function SermonGenerationForm({ onSermonGenerated }: SermonGenerationFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [topic, setTopic] = useState('');
-  const [verseReference, setVerseReference] = useState('');
-  const [duration, setDuration] = useState<number>(30);
-  const [style, setStyle] = useState('');
-  const [tone, setTone] = useState('');
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
 
     try {
-      const request: SermonGenerationRequest = {
-        topic,
-        verseReference,
-        duration,
-        style,
-        tone
-      };
+      const formData = new FormData(event.currentTarget);
+      const params = Object.fromEntries(formData.entries());
+      
+      const response = await fetch('/api/sermons', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(params),
+      });
 
-      const sermon = await generateSermon(userId, request);
+      if (!response.ok) {
+        throw new Error('Erro ao gerar sermão');
+      }
+
+      const sermon = await response.json();
       onSermonGenerated(sermon);
     } catch (error) {
       console.error('Erro ao gerar sermão:', error);
@@ -46,48 +46,51 @@ export default function SermonGenerationForm({ onSermonGenerated, userId }: Serm
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Zap className="h-5 w-5" />
-          Gerar Novo Sermão
-        </CardTitle>
+        <CardTitle>Gerador de Sermão</CardTitle>
         <CardDescription>
-          Preencha os detalhes abaixo para gerar um sermão personalizado
+          Insira os parâmetros desejados para gerar um sermão personalizado
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="topic">Tema do Sermão</Label>
-            <Input
-              id="topic"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder="Ex: O amor de Deus"
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="verse">Referência Bíblica (opcional)</Label>
-            <Input
-              id="verse"
-              value={verseReference}
-              onChange={(e) => setVerseReference(e.target.value)}
-              placeholder="Ex: João 3:16"
-            />
-          </div>
-
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="duration">Duração (minutos)</Label>
-              <Select value={duration.toString()} onValueChange={(value) => setDuration(parseInt(value))}>
+              <Label htmlFor="theme">Tema Principal</Label>
+              <Input
+                id="theme"
+                name="theme"
+                placeholder="Ex: Esperança, Fé, Amor"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="purpose">Propósito</Label>
+              <Select name="purpose" required>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Selecione o propósito" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="inspirar">Inspirar</SelectItem>
+                  <SelectItem value="ensinar">Ensinar</SelectItem>
+                  <SelectItem value="confrontar">Confrontar</SelectItem>
+                  <SelectItem value="consolar">Consolar</SelectItem>
+                  <SelectItem value="motivar">Motivar</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="duration">Duração (minutos)</Label>
+              <Select name="duration" required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Duração do sermão" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="15">15 minutos</SelectItem>
+                  <SelectItem value="20">20 minutos</SelectItem>
                   <SelectItem value="30">30 minutos</SelectItem>
                   <SelectItem value="45">45 minutos</SelectItem>
                   <SelectItem value="60">60 minutos</SelectItem>
@@ -96,19 +99,39 @@ export default function SermonGenerationForm({ onSermonGenerated, userId }: Serm
             </div>
 
             <div>
-              <Label htmlFor="style-override">Estilo (opcional)</Label>
-              <Select value={style} onValueChange={setStyle}>
+              <Label htmlFor="audience">Audiência</Label>
+              <Select name="audience">
                 <SelectTrigger>
-                  <SelectValue placeholder="Usar padrão do DNA" />
+                  <SelectValue placeholder="Tipo de audiência" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Expositivo">Expositivo</SelectItem>
-                  <SelectItem value="Temático">Temático</SelectItem>
-                  <SelectItem value="Narrativo">Narrativo</SelectItem>
-                  <SelectItem value="Textual">Textual</SelectItem>
+                  <SelectItem value="geral">Congregação Geral</SelectItem>
+                  <SelectItem value="jovens">Jovens</SelectItem>
+                  <SelectItem value="adultos">Adultos</SelectItem>
+                  <SelectItem value="criancas">Crianças</SelectItem>
+                  <SelectItem value="casais">Casais</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div>
+            <Label htmlFor="scripture">Texto Bíblico Base (Opcional)</Label>
+            <Input
+              id="scripture"
+              name="scripture"
+              placeholder="Ex: João 3:16, Salmos 23, Romanos 8:28"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="context">Contexto Especial (Opcional)</Label>
+            <Textarea
+              id="context"
+              name="context"
+              placeholder="Descreva algum contexto especial para este sermão..."
+              rows={3}
+            />
           </div>
 
           <Button type="submit" disabled={isLoading} className="w-full">
