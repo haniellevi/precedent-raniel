@@ -1,0 +1,149 @@
+Olá! Por favor, execute as seguintes tarefas cruciais para finalizar a estrutura do frontend e iniciar a implementação do backend com Prisma.
+
+Tarefa 1: Correção Definitiva do Layout com Cabeçalho Único
+Ação: Vamos centralizar toda a lógica do cabeçalho em um único componente e simplificar os layouts.
+
+1. Crie o novo componente de Cabeçalho: components/layout/header.tsx
+Este componente será "inteligente" e mostrará diferentes menus para usuários logados e deslogados.
+
+// components/layout/header.tsx
+import Link from 'next/link';
+import Image from 'next/image';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { Button } from '@/components/ui/button';
+import MainNav from '@/components/layout/main-nav';
+
+export default function Header() {
+  return (
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
+        <div className="mr-4 hidden md:flex">
+          <Link href="/" className="mr-6 flex items-center space-x-2">
+            <Image
+              src="/logo.png"
+              alt="SermonAI Logo"
+              width={24}
+              height={24}
+              className="h-6 w-6"
+            />
+            <span className="font-bold">SermonAI</span>
+          </Link>
+          <nav className="flex items-center space-x-6 text-sm font-medium">
+            {/* O menu principal agora é um componente separado */}
+            <MainNav />
+          </nav>
+        </div>
+        
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          <SignedOut>
+            <Button asChild variant="ghost">
+              <Link href="/sign-in">Login</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/sign-up">Cadastre-se</Link>
+            </Button>
+          </SignedOut>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+2. Crie o novo componente de Navegação Principal: components/layout/main-nav.tsx
+Separar a navegação em seu próprio arquivo deixa o código mais limpo.
+
+// components/layout/main-nav.tsx
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { SignedIn } from '@clerk/nextjs';
+
+const navItems = [
+  { name: 'Gerar Sermão', href: '/gerar' },
+  { name: 'Histórico', href: '/historico' },
+  { name: 'Meu DNA', href: '/dna' },
+];
+
+export default function MainNav() {
+  const pathname = usePathname();
+
+  return (
+    <SignedIn>
+      {navItems.map((item) => (
+        <Link
+          key={item.name}
+          href={item.href}
+          className={cn(
+            "transition-colors hover:text-foreground/80",
+            pathname.startsWith(item.href) ? "text-foreground" : "text-muted-foreground"
+          )}
+        >
+          {item.name}
+        </Link>
+      ))}
+    </SignedIn>
+  );
+}
+
+3. Simplifique o Layout do Dashboard: app/(dashboard)/layout.tsx
+Este layout agora só precisa definir a área de conteúdo, pois o cabeçalho e rodapé são globais.
+
+// app/(dashboard)/layout.tsx
+import { ReactNode } from 'react';
+
+export default function DashboardLayout({ children }: { children: ReactNode }) {
+  // O Header e Footer agora estão no layout raiz (app/layout.tsx)
+  // Este layout serve apenas para agrupar as rotas do dashboard.
+  return <>{children}</>;
+}
+
+4. Atualize o Layout Raiz: app/layout.tsx
+Este é o passo mais importante. O layout raiz agora contém o Cabeçalho e Rodapé globais.
+
+// app/layout.tsx
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { ClerkProvider } from '@clerk/nextjs';
+import { Analytics } from '@vercel/analytics/react';
+import Header from '@/components/layout/header'; // Importa o novo Header
+import Footer from '@/components/layout/footer';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata = {
+  title: 'SermonAI - Gerador de Sermões com IA',
+  description: 'Crie sermões de alto impacto com a sua voz e personalidade.',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ClerkProvider>
+      <html lang="pt-BR">
+        <body className={inter.className}>
+          <div className="relative flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
+            <Header />
+            <main className="flex-1">
+              <div className="container py-8">
+                {children}
+              </div>
+            </main>
+            <Footer />
+          </div>
+          <Analytics />
+        </body>
+      </html>
+    </ClerkProvider>
+  );
+}
+
+5. Remova o Componente de Cabeçalho Antigo
+Para evitar confusão, remova o arquivo components/layout/main-header.tsx se ele ainda existir.
