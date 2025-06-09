@@ -1,0 +1,284 @@
+Olá! Por favor, execute as seguintes tarefas no projeto Next.js para construir a funcionalidade completa de "Histórico de Sermões" com dados mock.
+
+Tarefa 1: Atualizar o Serviço de Mock com Dados de Histórico
+Ação: Substitua completamente o conteúdo do arquivo lib/mockApi.ts pelo código abaixo. Este novo código adiciona um histórico de sermões mais robusto e a função para buscá-lo.
+
+Caminho do Arquivo: lib/mockApi.ts
+
+// lib/mockApi.ts
+
+// --- Interfaces de Dados ---
+export interface DnaProfile {
+  type: 'padrao' | 'customizado';
+  name: string;
+  customAttributes?: {
+    style: string;
+    tone: string;
+    vocabulary: string[];
+  };
+  calculatedPpm: number;
+}
+
+export interface Sermon {
+  id: string;
+  title: string;
+  content: string; // Conteúdo em Markdown
+  enrichmentSuggestions: string;
+  parameters: {
+    theme: string;
+    purpose: string;
+    duration: number;
+  };
+  createdAt: string;
+}
+
+// --- Dados Mock ---
+const mockDnaProfile: DnaProfile = {
+  type: 'customizado',
+  name: 'Meu DNA Personalizado',
+  customAttributes: {
+    style: 'Expositivo e Prático',
+    tone: 'Inspirador e Encorajador',
+    vocabulary: ['graça', 'redenção', 'propósito', 'comunidade'],
+  },
+  calculatedPpm: 120,
+};
+
+const mockSermonHistory: Sermon[] = [
+  {
+    id: 'sermon-001',
+    title: 'A Coragem para Recomeçar',
+    content: `# A Coragem para Recomeçar... (conteúdo completo do sermão)`,
+    enrichmentSuggestions: `* Ilustração: Use a metáfora de uma árvore podada...`,
+    parameters: { theme: 'Recomeço', purpose: 'Inspirar', duration: 20 },
+    createdAt: '2025-06-05T10:00:00Z',
+  },
+  {
+    id: 'sermon-002',
+    title: 'Vivendo em Comunidade',
+    content: `# Vivendo em Comunidade... (conteúdo completo do sermão)`,
+    enrichmentSuggestions: `* Dinâmica: Peça para as pessoas se cumprimentarem...`,
+    parameters: { theme: 'Comunidade', purpose: 'Ensinar', duration: 30 },
+    createdAt: '2025-05-28T11:30:00Z',
+  },
+  {
+    id: 'sermon-003',
+    title: 'O Propósito na Espera',
+    content: `# O Propósito na Espera... (conteúdo completo do sermão)`,
+    enrichmentSuggestions: `* Versículo Chave: Isaías 40:31...`,
+    parameters: { theme: 'Paciência', purpose: 'Consolar', duration: 25 },
+    createdAt: '2025-05-15T09:45:00Z',
+  },
+];
+
+
+// --- Funções do Serviço Mock ---
+
+export const getDnaProfile = async (): Promise<DnaProfile> => {
+  console.log('MOCK API: Buscando perfil de DNA...');
+  return new Promise((resolve) => setTimeout(() => resolve(mockDnaProfile), 1000));
+};
+
+export const updateDnaProfile = async (data: any): Promise<{ success: boolean }> => {
+  console.log('MOCK API: Atualizando perfil de DNA com os dados:', data);
+  return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1500));
+};
+
+export const generateSermon = async (params: any): Promise<Sermon> => {
+  console.log('MOCK API: Gerando sermão com parâmetros:', params);
+  // Retorna o primeiro item do histórico como se tivesse sido gerado agora
+  const newSermon = { ...mockSermonHistory[0], id: `gen-${Date.now()}`, createdAt: new Date().toISOString() };
+  return new Promise((resolve) => setTimeout(() => resolve(newSermon), 3000));
+};
+
+export const getSermonHistory = async (): Promise<Sermon[]> => {
+  console.log('MOCK API: Buscando histórico de sermões...');
+  return new Promise((resolve) => setTimeout(() => resolve(mockSermonHistory), 800));
+};
+
+Tarefa 2: Criar o Componente para a Lista de Histórico
+Ação: Crie o arquivo components/sermon-history-list.tsx. Este componente de cliente renderizará a lista de sermões recebida da página.
+
+Caminho do Arquivo: components/sermon-history-list.tsx
+
+// components/sermon-history-list.tsx
+'use client';
+
+import { Sermon } from '@/lib/mockApi';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { BookOpen, Calendar, Clock } from 'lucide-react';
+
+interface SermonHistoryListProps {
+  sermons: Sermon[];
+}
+
+export default function SermonHistoryList({ sermons }: SermonHistoryListProps) {
+  if (sermons.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <h3 className="text-xl font-semibold">Nenhum sermão encontrado</h3>
+        <p className="text-muted-foreground mt-2">Você ainda não gerou nenhum sermão. Comece agora!</p>
+        <Button className="mt-4">Gerar primeiro sermão</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {sermons.map((sermon) => (
+        <Card key={sermon.id} className="flex flex-col">
+          <CardHeader>
+            <CardTitle>{sermon.title}</CardTitle>
+            <CardDescription className="flex items-center pt-1">
+              <BookOpen className="mr-1.5 h-4 w-4" /> 
+              {sermon.parameters.theme}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <div className="text-sm text-muted-foreground space-y-2">
+              <div className="flex items-center">
+                <Calendar className="mr-2 h-4 w-4" />
+                <span>Gerado em: {new Date(sermon.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center">
+                <Clock className="mr-2 h-4 w-4" />
+                <span>Duração: {sermon.parameters.duration} min</span>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" className="w-full">
+              Ver Sermão
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+Tarefa 3: Criar a Página Principal de "Histórico"
+Ação: Crie o diretório historico e, dentro dele, o arquivo page.tsx. Esta página será um Server Component que busca os dados e os passa para o componente da lista.
+
+Caminho do Arquivo: app/(dashboard)/historico/page.tsx
+
+// app/(dashboard)/historico/page.tsx
+import { getSermonHistory } from '@/lib/mockApi';
+import SermonHistoryList from '@/components/sermon-history-list';
+import { Suspense } from 'react';
+
+// Componente para exibir um esqueleto de carregamento
+function LoadingSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="border bg-card text-card-foreground rounded-lg p-6 space-y-4 animate-pulse">
+          <div className="h-6 w-3/4 bg-muted rounded"></div>
+          <div className="h-4 w-1/2 bg-muted rounded"></div>
+          <div className="space-y-2 pt-4">
+            <div className="h-4 w-full bg-muted rounded"></div>
+            <div className="h-4 w-full bg-muted rounded"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Componente assíncrono que busca os dados
+async function HistoryData() {
+  const sermons = await getSermonHistory();
+  return <SermonHistoryList sermons={sermons} />;
+}
+
+export default function HistoryPage() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Histórico de Sermões</h1>
+        <p className="text-muted-foreground">
+          Acesse e revise todas as mensagens que você já gerou.
+        </p>
+      </div>
+      <Suspense fallback={<LoadingSkeleton />}>
+        {/* @ts-expect-error Server Component */}
+        <HistoryData />
+      </Suspense>
+    </div>
+  );
+}
+
+Tarefa 4: Atualizar o Layout Principal para Navegação
+Ação: Edite o arquivo app/(dashboard)/layout.tsx para adicionar o link "Histórico" no menu de navegação do cabeçalho.
+
+Caminho do Arquivo: app/(dashboard)/layout.tsx
+
+// app/(dashboard)/layout.tsx
+import { ReactNode } from 'react';
+import { UserButton } from '@clerk/nextjs';
+import Link from 'next/link';
+import Image from 'next/image';
+import Footer from '@/components/layout/footer';
+
+export default async function DashboardLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <div className="relative flex min-h-screen flex-col">
+      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+          <div className="flex gap-6 md:gap-10">
+            <Link href="/gerar" className="flex items-center space-x-2">
+              <Image
+                src="/logo.png"
+                alt="SermonAI Logo"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
+              <span className="inline-block font-bold">SermonAI</span>
+            </Link>
+          </div>
+          <div className="flex flex-1 items-center justify-end space-x-4">
+            {/* === INÍCIO DA ALTERAÇÃO === */}
+            <nav className="flex items-center space-x-6 text-sm font-medium">
+              <Link
+                href="/gerar"
+                className="transition-colors hover:text-foreground/80 text-muted-foreground"
+              >
+                Gerar Sermão
+              </Link>
+              <Link
+                href="/historico"
+                className="transition-colors hover:text-foreground/80 text-muted-foreground"
+              >
+                Histórico
+              </Link>
+              <Link
+                href="/dna"
+                className="transition-colors hover:text-foreground/80 text-muted-foreground"
+              >
+                Meu DNA
+              </Link>
+            </nav>
+            {/* === FIM DA ALTERAÇÃO === */}
+            <div className="flex items-center space-x-4">
+               <UserButton afterSignOutUrl="/" />
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <main className="flex-1">
+        <div className="container py-8">
+            {children}
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
