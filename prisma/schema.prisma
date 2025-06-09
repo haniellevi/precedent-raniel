@@ -1,3 +1,4 @@
+
 // prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
@@ -23,23 +24,21 @@ model User {
   isActive Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  
   dnaProfile DnaProfile?
   sermons    Sermon[]
 }
 
 model DnaProfile {
   id        String   @id @default(cuid())
-  userId    String   @unique // Um usuário tem apenas um perfil de DNA
+  userId    String   @unique
   user      User     @relation(fields: [userId], references: [clerkUserId], onDelete: Cascade)
-
+  
   name      String   @default("Meu Perfil de Pregação")
-  style     String?  // Ex: Expositivo, Temático
-  tone      String?  // Ex: Inspirador, Confrontador
-
-  // Este campo pode ser usado para armazenar dados extra no futuro
+  style     String?
+  tone      String?
   customAttributes Json?
-
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -50,10 +49,8 @@ model Sermon {
   user   User   @relation(fields: [userId], references: [clerkUserId], onDelete: Cascade)
   title String
   content String @db.Text
-  parameters Json // Armazena os parâmetros usados para a geração
+  parameters Json
   enrichmentSuggestions String? @db.Text
-  qualityAssessment     Json?
-  planType UserRole
   createdAt DateTime @default(now())
   @@index([userId])
 }
