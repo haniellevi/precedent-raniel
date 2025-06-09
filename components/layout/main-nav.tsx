@@ -14,7 +14,7 @@ const navItems = [
 
 export default function MainNav() {
   const pathname = usePathname();
-
+  
   return (
     <SignedIn>
       {navItems.map((item) => (
