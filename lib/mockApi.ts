@@ -1,22 +1,21 @@
-
 // lib/mockApi.ts
 
 // --- Interfaces de Dados ---
 export interface DnaProfile {
-  type: 'padrao' | 'customizado';
+  type: 'padrão' | 'customizado';
   name: string;
   customAttributes?: {
-    style: string;
-    tone: string;
-    vocabulary: string[];
+    style?: string;
+    tone?: string;
+    vocabulary?: string[];
   };
-  calculatedPpm: number;
+  calculatedPpm?: number;
 }
 
 export interface Sermon {
   id: string;
   title: string;
-  content: string; // Conteúdo em Markdown
+  content: string;
   enrichmentSuggestions: string;
   parameters: {
     theme: string;
@@ -24,6 +23,25 @@ export interface Sermon {
     duration: number;
   };
   createdAt: string;
+}
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'free' | 'basic' | 'pro' | 'admin';
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface AdminMetrics {
+  totalUsers: number;
+  totalSermons: number;
+  activeSubscriptions: number;
+  dnaUsage: {
+    standard: number;
+    custom: number;
+  };
 }
 
 // --- Dados Mock ---
@@ -104,6 +122,51 @@ Na espera, aprendemos a depender completamente de Deus e descobrimos Sua fidelid
   },
 ];
 
+const mockAdminUsers: AdminUser[] = [
+  {
+    id: 'admin-001',
+    name: 'Admin Teste',
+    email: 'admin@teste.com',
+    role: 'admin',
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 'user-001',
+    name: 'User Free',
+    email: 'free@teste.com',
+    role: 'free',
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 'user-002',
+    name: 'User Basic',
+    email: 'basic@teste.com',
+    role: 'basic',
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 'user-003',
+    name: 'User Pro',
+    email: 'pro@teste.com',
+    role: 'pro',
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+];
+
+const mockAdminMetrics: AdminMetrics = {
+  totalUsers: 150,
+  totalSermons: 520,
+  activeSubscriptions: 85,
+  dnaUsage: {
+    standard: 60,
+    custom: 40,
+  },
+};
+
 // --- Funções do Serviço Mock ---
 
 export const getDnaProfile = async (): Promise<DnaProfile> => {
@@ -125,5 +188,28 @@ export const generateSermon = async (params: any): Promise<Sermon> => {
 
 export const getSermonHistory = async (): Promise<Sermon[]> => {
   console.log('MOCK API: Buscando histórico de sermões...');
-  return new Promise((resolve) => setTimeout(() => resolve(mockSermonHistory), 800));
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockSermonHistory);
+    }, 600);
+  });
+};
+
+// NOVAS FUNÇÕES ADMIN
+export const getAdminMetrics = async (): Promise<AdminMetrics> => {
+  console.log('MOCK API: Buscando métricas admin...');
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockAdminMetrics);
+    }, 700);
+  });
+};
+
+export const getAdminUsers = async (): Promise<AdminUser[]> => {
+  console.log('MOCK API: Buscando usuários admin...');
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockAdminUsers);
+    }, 900);
+  });
 };
