@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Zap } from 'lucide-react';
 import { Sermon } from '@/lib/mockApi';
 
 interface SermonGenerationFormProps {
@@ -142,7 +142,7 @@ export default function SermonGenerationForm({ onSermonGenerated }: SermonGenera
               </>
             ) : (
               <>
-                <Sparkles className="mr-2 h-4 w-4" />
+                <Zap className="mr-2 h-4 w-4" />
                 Gerar Sermão
               </>
             )}

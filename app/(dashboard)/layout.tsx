@@ -1,3 +1,4 @@
+
 import { ReactNode } from 'react';
 import Footer from '@/components/layout/footer';
 import MainHeader from '@/components/layout/main-header';

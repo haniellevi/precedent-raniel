@@ -1,4 +1,32 @@
 
+// Mock functions for API calls
+
+export async function updateDnaProfile(profileData: any) {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  return {
+    success: true,
+    data: profileData
+  };
+}
+
+export async function generateSermon(data: any) {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  return {
+    id: 'sermon-' + Date.now(),
+    title: 'Sermão Gerado: ' + data.theme,
+    content: `# ${data.theme}\n\n## Introdução\nEste é um sermão gerado automaticamente sobre ${data.theme}.\n\n## Desenvolvimento\nConteúdo principal do sermão.\n\n## Conclusão\nConclusão inspiradora.`,
+    enrichmentSuggestions: '* Adicione uma ilustração\n* Use um testemunho pessoal\n* Inclua uma aplicação prática',
+    parameters: data,
+    createdAt: new Date().toISOString()
+  };
+}
+
+
+
 // lib/mockApi.ts - ATUALIZADO PARA EXPORTAR APENAS DADOS
 
 // --- Interfaces ---
