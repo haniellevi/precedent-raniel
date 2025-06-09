@@ -1,0 +1,117 @@
+Tarefa 3: Reescrever as API Routes para Usar o Prisma
+Ação: Substitua o conteúdo das rotas de API existentes para que elas façam operações na base de dados com o Prisma, em vez de usar dados mock.
+
+1. Substitua o conteúdo do ficheiro: app/api/dna/route.ts
+
+// app/api/dna/route.ts
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@clerk/nextjs/server';
+
+// Busca o perfil de DNA do utilizador autenticado
+export async function GET() {
+  const { userId: clerkUserId } = auth();
+
+  if (!clerkUserId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  let dnaProfile = await prisma.dnaProfile.findUnique({
+    where: { userId: clerkUserId },
+  });
+
+  // Se o utilizador não tem um perfil, cria um padrão na base de dados
+  if (!dnaProfile) {
+    dnaProfile = await prisma.dnaProfile.create({
+        data: {
+            userId: clerkUserId,
+            name: "Meu Perfil de Pregação",
+            style: "Expositivo",
+            tone: "Inspirador",
+        }
+    })
+  }
+  
+  return NextResponse.json(dnaProfile);
+}
+
+// Cria ou atualiza o perfil de DNA do utilizador autenticado
+export async function POST(request: Request) {
+    const { userId: clerkUserId } = auth();
+    if (!clerkUserId) {
+        return new Response("Unauthorized", { status: 401 });
+    }
+
+    const data = await request.json();
+
+    const updatedProfile = await prisma.dnaProfile.upsert({
+        where: { userId: clerkUserId },
+        update: {
+            style: data.style,
+            tone: data.tone,
+        },
+        create: {
+            userId: clerkUserId,
+            style: data.style,
+            tone: data.tone,
+        }
+    });
+
+    return NextResponse.json(updatedProfile);
+}
+
+2. Substitua o conteúdo do ficheiro: app/api/sermons/history/route.ts
+
+// app/api/sermons/history/route.ts
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@clerk/nextjs/server';
+
+export async function GET() {
+  const { userId: clerkUserId } = auth();
+
+  if (!clerkUserId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const sermons = await prisma.sermon.findMany({
+    where: { userId: clerkUserId },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return NextResponse.json(sermons);
+}
+
+3. Substitua o conteúdo do ficheiro: app/api/sermons/route.ts
+
+// app/api/sermons/route.ts
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@clerk/nextjs/server';
+
+export async function POST(request: Request) {
+  const { sessionClaims, userId: clerkUserId } = auth();
+  
+  if (!clerkUserId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const params = await request.json();
+
+  // AQUI ENTRARÁ A LÓGICA DE CHAMADA À IA NO FUTURO
+  // Por enquanto, vamos guardar um sermão de exemplo na base de dados
+
+  const newSermon = await prisma.sermon.create({
+    data: {
+        userId: clerkUserId,
+        title: `Sermão sobre ${params.theme || 'Vida Cristã'}`,
+        content: `Este é um sermão gerado sobre ${params.theme}. O conteúdo completo será criado pela IA.`,
+        parameters: params,
+        enrichmentSuggestions: "Sugestões de enriquecimento geradas pela IA aparecerão aqui.",
+    }
+  });
+
+  return NextResponse.json(newSermon);
+}
