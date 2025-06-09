@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UploadCloud, Youtube, Loader2, CheckCircle } from 'lucide-react';
+import { Loader2, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface DnaFormProps {
@@ -17,13 +17,13 @@ interface DnaFormProps {
 export default function DnaForm({ initialProfile }: DnaFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [dnaType, setDnaType] = useState<'padrao' | 'customizado'>(initialProfile.type);
-  const [name, setName] = useState(initialProfile.name);
-  const [style, setStyle] = useState(initialProfile.customAttributes?.style || '');
-  const [tone, setTone] = useState(initialProfile.customAttributes?.tone || '');
-  const [vocabulary, setVocabulary] = useState(initialProfile.customAttributes?.vocabulary?.join(', ') || '');
-  const [sermonContent, setSermonContent] = useState('');
-  const [videoUrl, setVideoUrl] = useState('');
+
+  // Estados para controlar os campos do formulário
+  const [style, setStyle] = useState(initialProfile.customAttributes?.style || 'Expositivo');
+  const [tone, setTone] = useState(initialProfile.customAttributes?.tone || 'Inspirador');
+  const [sermonText, setSermonText] = useState('');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -31,106 +31,89 @@ export default function DnaForm({ initialProfile }: DnaFormProps) {
     setIsSuccess(false);
 
     try {
-      const formData = {
-        type: dnaType,
-        name,
-        customAttributes: dnaType === 'customizado' ? {
-          style,
-          tone,
-          vocabulary: vocabulary.split(',').map(word => word.trim()).filter(word => word.length > 0)
-        } : undefined,
-        sermonContent,
-        videoUrl
-      };
+        const formData = { style, tone, sermonText, youtubeUrl };
+        const response = await fetch('/api/dna', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+        });
 
-      const response = await fetch('/api/dna', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+        if (!response.ok) throw new Error('Falha ao salvar o DNA');
 
-      if (!response.ok) {
-        throw new Error('Erro ao salvar dados');
-      }
+        setIsSuccess(true);
+        setTimeout(() => setIsSuccess(false), 4000);
 
-      setIsSuccess(true);
-      setTimeout(() => setIsSuccess(false), 4000);
     } catch (error) {
-      console.error('Erro ao salvar DNA:', error);
+        console.error("Erro ao submeter o formulário de DNA:", error);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="w-full max-w-3xl mx-auto shadow-lg border">
       <CardHeader>
         <CardTitle>Configuração do DNA de Pregação</CardTitle>
         <CardDescription>
-          Configure seu perfil único de pregação para gerar sermões personalizados.
+          Forneça referências para a IA aprender seu estilo e gerar sermões com a sua voz.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="dna-type">Tipo de DNA</Label>
-              <Select value={dnaType} onValueChange={(value: 'padrao' | 'customizado') => setDnaType(value)}>
-                <SelectTrigger id="dna-type">
-                  <SelectValue placeholder="Selecione o tipo" />
-                </SelectTrigger>
+              <Label htmlFor="style">Estilo de Pregação</Label>
+              <Select name="style" value={style} onValueChange={setStyle}>
+                <SelectTrigger id="style"><SelectValue placeholder="Selecione um estilo" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="padrao">DNA Padrão</SelectItem>
-                  <SelectItem value="customizado">DNA Customizado</SelectItem>
+                  <SelectItem value="Expositivo">Expositivo</SelectItem>
+                  <SelectItem value="Temático">Temático</SelectItem>
+                  <SelectItem value="Narrativo">Narrativo</SelectItem>
+                  <SelectItem value="Textual">Textual</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="name">Nome do Perfil</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Label htmlFor="tone">Tom da Pregação</Label>
+              <Select name="tone" value={tone} onValueChange={setTone}>
+                <SelectTrigger id="tone"><SelectValue placeholder="Selecione um tom" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Inspirador">Inspirador</SelectItem>
+                  <SelectItem value="Encorajador">Encorajador</SelectItem>
+                  <SelectItem value="Confrontador">Confrontador</SelectItem>
+                  <SelectItem value="Consolador">Consolador</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-
-          {dnaType === 'customizado' && (
-            <div className="space-y-4 p-4 border rounded-lg bg-slate-50 dark:bg-slate-900">
-              <h3 className="font-semibold text-lg">Atributos Customizados</h3>
-              <div>
-                <Label htmlFor="style">Estilo de Pregação</Label>
-                <Input id="style" value={style} onChange={(e) => setStyle(e.target.value)} placeholder="Ex: Expositivo e Prático" />
-              </div>
-              <div>
-                <Label htmlFor="tone">Tom da Pregação</Label>
-                <Input id="tone" value={tone} onChange={(e) => setTone(e.target.value)} placeholder="Ex: Inspirador e Encorajador" />
-              </div>
-              <div>
-                <Label htmlFor="vocabulary">Vocabulário Frequente</Label>
-                <Input id="vocabulary" value={vocabulary} onChange={(e) => setVocabulary(e.target.value)} placeholder="graça, redenção (separado por vírgula)" />
-              </div>
-            </div>
-          )}
 
           <div>
             <Label htmlFor="sermon-content">Fonte de Dados 1: Texto de Sermões</Label>
-            <Textarea id="sermon-content" value={sermonContent} onChange={(e) => setSermonContent(e.target.value)} placeholder="Cole aqui o texto de um ou mais sermões para análise..." rows={6} />
+            <Textarea 
+              id="sermon-content" 
+              name="sermon-content"
+              value={sermonText}
+              onChange={(e) => setSermonText(e.target.value)}
+              placeholder="Cole aqui o texto de um ou mais sermões para análise..." 
+              rows={8} 
+            />
           </div>
           <div>
             <Label htmlFor="video-url">Fonte de Dados 2: URL de Vídeo do YouTube</Label>
-            <div className="relative">
-              <Youtube className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input id="video-url" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." className="pl-10" />
-            </div>
+            <Input 
+              id="video-url" 
+              name="video-url"
+              value={youtubeUrl}
+              onChange={(e) => setYoutubeUrl(e.target.value)}
+              placeholder="https://youtube.com/watch?v=..." 
+            />
           </div>
 
-          <div className="flex justify-end items-center gap-4">
-            {isSuccess && (
-              <span className="text-sm text-green-600 flex items-center">
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Salvo com Sucesso!
-              </span>
-            )}
-            <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
+          <div className="flex justify-end items-center gap-4 pt-4">
+            {isSuccess && <span className="text-sm text-green-600 flex items-center"><CheckCircle className="mr-2 h-4 w-4" />Salvo!</span>}
+            <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Salvar DNA
+              Analisar e Salvar DNA
             </Button>
           </div>
         </form>
