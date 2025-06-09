@@ -1,0 +1,88 @@
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  imageUrl  String?
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  dnaProfile DnaProfile?
+  sermons    Sermon[]
+
+  @@map("users")
+}
+
+model DnaProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  preachingStyle    String?
+  favoriteTopics    String[]
+  targetAudience    String?
+  theologicalStyle  String?
+  preferredDuration Int?     // em minutos
+  languageStyle     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relacionamentos
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("dna_profiles")
+}
+
+model Sermon {
+  id         String      @id @default(cuid())
+  title      String
+  content    String
+  parameters Json // Armazena os parâmetros usados na geração
+  status     SermonStatus @default(COMPLETED)
+  userId     String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  // Relacionamentos
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sermons")
+}
+
+model AdminPrompt {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  content     String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("admin_prompts")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SermonStatus {
+  PENDING
+  GENERATING
+  COMPLETED
+  ERROR
+}
