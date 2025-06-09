@@ -1,4 +1,3 @@
-
 // app/(dashboard)/layout.tsx
 import { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
@@ -35,8 +34,14 @@ export default async function DashboardLayout({
           <div className="flex flex-1 items-center justify-end space-x-4">
             <nav className="flex items-center space-x-6 text-sm font-medium">
               <Link
-                href="/dna"
+                href="/gerar"
                 className="transition-colors hover:text-foreground/80 text-foreground"
+              >
+                Gerar Sermão
+              </Link>
+              <Link
+                href="/dna"
+                className="transition-colors hover:text-foreground/80 text-muted-foreground"
               >
                 Meu DNA
               </Link>
@@ -48,7 +53,7 @@ export default async function DashboardLayout({
           </div>
         </div>
       </header>
-      
+
       {/* Conteúdo principal da página */}
       <main className="container flex-1 items-start py-8">
         {children}
