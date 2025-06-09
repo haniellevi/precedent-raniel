@@ -1,10 +1,9 @@
-
 // Mock functions for API calls
 
 export async function updateDnaProfile(profileData: any) {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   return {
     success: true,
     data: profileData
@@ -14,7 +13,7 @@ export async function updateDnaProfile(profileData: any) {
 export async function generateSermon(data: any) {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
   return {
     id: 'sermon-' + Date.now(),
     title: 'Sermão Gerado: ' + data.theme,
@@ -197,3 +196,13 @@ export const mockAgentPromptsData: AgentPrompt[] = [
     updatedAt: '2025-06-05T15:30:00Z', 
   } 
 ];
+
+export const generateSermon = async (params: any): Promise<Sermon> => {
+  console.log('MOCK API: Gerando sermão com parâmetros:', params);
+  return new Promise((resolve) => setTimeout(() => resolve(generatedSermonMock), 3000));
+};
+
+export const updateDnaProfile = async (data: any): Promise<{ success: boolean }> => {
+  console.log('MOCK API: Atualizando perfil de DNA com os dados:', data);
+  return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1500));
+};

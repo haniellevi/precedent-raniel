@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -25,7 +24,7 @@ export default function SermonGenerationForm({ onSermonGenerated }: SermonGenera
     try {
       const formData = new FormData(event.currentTarget);
       const params = Object.fromEntries(formData.entries());
-      
+
       const response = await fetch('/api/sermons', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

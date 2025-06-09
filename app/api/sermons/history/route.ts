@@ -1,9 +1,21 @@
 
 import { NextResponse } from 'next/server';
-import { mockSermonHistoryData } from '@/lib/mockApi';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@clerk/nextjs/server';
 
-// Simula a busca do histórico de sermões
 export async function GET() {
-  await new Promise(resolve => setTimeout(resolve, 800));
-  return NextResponse.json(mockSermonHistoryData);
+  const { userId: clerkUserId } = auth();
+
+  if (!clerkUserId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const sermons = await prisma.sermon.findMany({
+    where: { userId: clerkUserId },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return NextResponse.json(sermons);
 }

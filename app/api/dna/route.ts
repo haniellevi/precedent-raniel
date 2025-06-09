@@ -1,17 +1,56 @@
 
 import { NextResponse } from 'next/server';
-import { mockDnaProfileData } from '@/lib/mockApi';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@clerk/nextjs/server';
 
-// Simula a busca do perfil de DNA
+// Busca o perfil de DNA do utilizador autenticado
 export async function GET() {
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simula latência
-  return NextResponse.json(mockDnaProfileData);
+  const { userId: clerkUserId } = auth();
+
+  if (!clerkUserId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  let dnaProfile = await prisma.dnaProfile.findUnique({
+    where: { userId: clerkUserId },
+  });
+
+  // Se o utilizador não tem um perfil, cria um padrão na base de dados
+  if (!dnaProfile) {
+    dnaProfile = await prisma.dnaProfile.create({
+        data: {
+            userId: clerkUserId,
+            name: "Meu Perfil de Pregação",
+            style: "Expositivo",
+            tone: "Inspirador",
+        }
+    })
+  }
+  
+  return NextResponse.json(dnaProfile);
 }
 
-// Simula a atualização do perfil de DNA
+// Cria ou atualiza o perfil de DNA do utilizador autenticado
 export async function POST(request: Request) {
-  const data = await request.json();
-  console.log('API RECEBEU DADOS PARA ATUALIZAR DNA:', data);
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  return NextResponse.json({ success: true });
+    const { userId: clerkUserId } = auth();
+    if (!clerkUserId) {
+        return new Response("Unauthorized", { status: 401 });
+    }
+
+    const data = await request.json();
+
+    const updatedProfile = await prisma.dnaProfile.upsert({
+        where: { userId: clerkUserId },
+        update: {
+            style: data.style,
+            tone: data.tone,
+        },
+        create: {
+            userId: clerkUserId,
+            style: data.style,
+            tone: data.tone,
+        }
+    });
+
+    return NextResponse.json(updatedProfile);
 }
