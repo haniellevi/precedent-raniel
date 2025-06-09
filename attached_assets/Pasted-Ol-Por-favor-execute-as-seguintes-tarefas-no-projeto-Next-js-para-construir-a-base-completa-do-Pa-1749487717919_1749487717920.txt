@@ -1,0 +1,253 @@
+Olá! Por favor, execute as seguintes tarefas no projeto Next.js para construir a base completa do Painel Administrativo.
+
+Tarefa 1: Atualizar o Serviço de Mock com Dados do Admin
+Ação: Substitua completamente o conteúdo do arquivo lib/mockApi.ts pelo código abaixo. Ele adiciona novas interfaces e funções para simular os dados do painel administrativo.
+
+Caminho do Arquivo: lib/mockApi.ts
+
+// lib/mockApi.ts
+
+// --- Interfaces de Dados ---
+export interface DnaProfile { /* ... (nenhuma alteração aqui) ... */ }
+export interface Sermon { /* ... (nenhuma alteração aqui) ... */ }
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'free' | 'basic' | 'pro' | 'admin';
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface AdminMetrics {
+  totalUsers: number;
+  totalSermons: number;
+  activeSubscriptions: number;
+  dnaUsage: {
+    standard: number;
+    custom: number;
+  };
+}
+
+
+// --- Dados Mock ---
+const mockDnaProfile: DnaProfile = { type: 'customizado', name: 'Meu DNA Personalizado', customAttributes: { style: 'Expositivo e Prático', tone: 'Inspirador e Encorajador', vocabulary: ['graça', 'redenção', 'propósito', 'comunidade'], }, calculatedPpm: 120, };
+const mockSermonHistory: Sermon[] = [ { id: 'sermon-001', title: 'A Coragem para Recomeçar', content: `# A Coragem para Recomeçar... (conteúdo completo do sermão)`, enrichmentSuggestions: `* Ilustração: Use a metáfora de uma árvore podada...`, parameters: { theme: 'Recomeço', purpose: 'Inspirar', duration: 20 }, createdAt: '2025-06-05T10:00:00Z', }, { id: 'sermon-002', title: 'Vivendo em Comunidade', content: `# Vivendo em Comunidade... (conteúdo completo do sermão)`, enrichmentSuggestions: `* Dinâmica: Peça para as pessoas se cumprimentarem...`, parameters: { theme: 'Comunidade', purpose: 'Ensinar', duration: 30 }, createdAt: '2025-05-28T11:30:00Z', }, { id: 'sermon-003', title: 'O Propósito na Espera', content: `# O Propósito na Espera... (conteúdo completo do sermão)`, enrichmentSuggestions: `* Versículo Chave: Isaías 40:31...`, parameters: { theme: 'Paciência', purpose: 'Consolar', duration: 25 }, createdAt: '2025-05-15T09:45:00Z', }, ];
+const mockAdminUsers: AdminUser[] = [
+  { id: 'user_2iabcde', name: 'Haniel Levi', email: 'haniel.levi@example.com', role: 'admin', isActive: true, createdAt: '2025-04-10T08:00:00Z'},
+  { id: 'user_2ifghij', name: 'Maria Silva', email: 'maria.silva@example.com', role: 'pro', isActive: true, createdAt: '2025-05-20T14:00:00Z'},
+  { id: 'user_2iklmn', name: 'João Pereira', email: 'joao.pereira@example.com', role: 'basic', isActive: true, createdAt: '2025-06-01T10:20:00Z'},
+  { id: 'user_2iopqrs', name: 'Ana Costa', email: 'ana.costa@example.com', role: 'free', isActive: false, createdAt: '2025-06-03T18:45:00Z'},
+];
+const mockAdminMetrics: AdminMetrics = {
+  totalUsers: 138,
+  totalSermons: 452,
+  activeSubscriptions: 73,
+  dnaUsage: { standard: 65, custom: 73 },
+};
+
+
+// --- Funções do Serviço Mock ---
+export const getDnaProfile = async (): Promise<DnaProfile> => new Promise((resolve) => setTimeout(() => resolve(mockDnaProfile), 500));
+export const updateDnaProfile = async (data: any): Promise<{ success: boolean }> => new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1000));
+export const generateSermon = async (params: any): Promise<Sermon> => { const newSermon = { ...mockSermonHistory[0], id: `gen-${Date.now()}`, createdAt: new Date().toISOString() }; return new Promise((resolve) => setTimeout(() => resolve(newSermon), 2000)); };
+export const getSermonHistory = async (): Promise<Sermon[]> => new Promise((resolve) => setTimeout(() => resolve(mockSermonHistory), 600));
+
+// NOVAS FUNÇÕES ADMIN
+export const getAdminMetrics = async (): Promise<AdminMetrics> => new Promise((resolve) => setTimeout(() => resolve(mockAdminMetrics), 700));
+export const getAdminUsers = async (): Promise<AdminUser[]> => new Promise((resolve) => setTimeout(() => resolve(mockAdminUsers), 900));
+
+Tarefa 2: Criar o Layout Protegido do Painel Admin
+Ação: Crie a estrutura de pastas e o arquivo de layout app/(admin)/layout.tsx. Este layout protegerá todas as rotas filhas e fornecerá uma navegação lateral específica para o admin.
+
+Caminho do Arquivo: app/(admin)/layout.tsx
+
+// app/(admin)/layout.tsx
+import { protect } from '@clerk/nextjs';
+import Link from 'next/link';
+import { ReactNode } from 'react';
+import { LayoutDashboard, Users, Bot, FileText, Home } from 'lucide-react';
+
+// Função de proteção do Clerk para garantir que apenas admins acessem
+const AdminLayout = ({ children }: { children: ReactNode }) => {
+  return (
+    <protect role="org:admin" fallbackRedirectUrl="/gerar">
+      <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+        <div className="hidden border-r bg-muted/40 md:block">
+          <div className="flex h-full max-h-screen flex-col gap-2">
+            <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+              <Link href="/gerar" className="flex items-center gap-2 font-semibold">
+                <FileText className="h-6 w-6" />
+                <span className="">SermonAI Admin</span>
+              </Link>
+            </div>
+            <div className="flex-1">
+              <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+                <Link href="/admin/dashboard" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"><LayoutDashboard className="h-4 w-4" />Dashboard</Link>
+                <Link href="/admin/usuarios" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"><Users className="h-4 w-4" />Usuários</Link>
+                <Link href="#" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"><Bot className="h-4 w-4" />Gerenciar IA (futuro)</Link>
+              </nav>
+            </div>
+            <div className="mt-auto p-4 border-t">
+               <Link href="/gerar" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"><Home className="h-4 w-4" />Voltar para App</Link>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col">
+          <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+            {children}
+          </main>
+        </div>
+      </div>
+    </protect>
+  );
+};
+
+export default AdminLayout;
+
+Tarefa 3: Criar a Página do Dashboard Admin
+Ação: Crie o diretório app/(admin)/dashboard e, dentro dele, o arquivo page.tsx. Esta página buscará e exibirá as métricas principais.
+
+Caminho do Arquivo: app/(admin)/dashboard/page.tsx
+
+// app/(admin)/dashboard/page.tsx
+import { getAdminMetrics } from "@/lib/mockApi";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, FileText, CheckCircle, BrainCircuit } from 'lucide-react';
+
+export default async function AdminDashboardPage() {
+  const metrics = await getAdminMetrics();
+
+  return (
+    <div>
+      <h1 className="text-3xl font-bold tracking-tight mb-6">Dashboard Administrativo</h1>
+      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{metrics.totalUsers}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Sermões</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{metrics.totalSermons}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Assinaturas Ativas</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{metrics.activeSubscriptions}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">DNAs Customizados</CardTitle>
+            <BrainCircuit className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{metrics.dnaUsage.custom}</div></CardContent>
+        </Card>
+      </div>
+       {/* Aqui podem entrar gráficos e outras visualizações no futuro */}
+    </div>
+  );
+}
+
+Tarefa 4: Criar a Página de Gerenciamento de Usuários
+Ação: Crie a estrutura app/(admin)/usuarios/page.tsx. Ela buscará os dados e os passará para um componente de tabela.
+
+Caminho do Arquivo: app/(admin)/usuarios/page.tsx
+
+// app/(admin)/usuarios/page.tsx
+import { getAdminUsers } from "@/lib/mockApi";
+import UsersTable from "@/components/admin/users-table";
+import { Suspense } from "react";
+
+function LoadingSkeleton() {
+    return <div className="h-64 w-full bg-muted rounded-lg animate-pulse"></div>
+}
+
+async function UsersData() {
+    const users = await getAdminUsers();
+    return <UsersTable users={users} />;
+}
+
+export default function AdminUsersPage() {
+  return (
+    <div>
+        <h1 className="text-3xl font-bold tracking-tight mb-6">Gerenciamento de Usuários</h1>
+        <Suspense fallback={<LoadingSkeleton />}>
+            {/* @ts-expect-error Server Component */}
+            <UsersData />
+        </Suspense>
+    </div>
+  );
+}
+
+Tarefa 5: Criar a Tabela de Usuários
+Ação: Crie o diretório components/admin e, dentro dele, o arquivo users-table.tsx.
+
+Caminho do Arquivo: components/admin/users-table.tsx
+
+// components/admin/users-table.tsx
+'use client';
+import { AdminUser } from "@/lib/mockApi";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
+
+interface UsersTableProps {
+  users: AdminUser[];
+}
+
+export default function UsersTable({ users }: UsersTableProps) {
+    return (
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Plano</TableHead>
+                    <TableHead>Registrado em</TableHead>
+                    <TableHead><span className="sr-only">Ações</span></TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {users.map((user) => (
+                    <TableRow key={user.id}>
+                        <TableCell className="font-medium">
+                            <div>{user.name}</div>
+                            <div className="text-sm text-muted-foreground">{user.email}</div>
+                        </TableCell>
+                        <TableCell>
+                            <Badge variant={user.isActive ? 'default' : 'destructive'}>
+                                {user.isActive ? 'Ativo' : 'Inativo'}
+                            </Badge>
+                        </TableCell>
+                        <TableCell>
+                            <Badge variant="secondary">{user.role.charAt(0).toUpperCase() + user.role.slice(1)}</Badge>
+                        </TableCell>
+                        <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild><Button aria-haspopup="true" size="icon" variant="ghost"><MoreHorizontal className="h-4 w-4" /><span className="sr-only">Toggle menu</span></Button></DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                    <DropdownMenuItem>Editar</DropdownMenuItem>
+                                    <DropdownMenuItem>Mudar Plano</DropdownMenuItem>
+                                    <DropdownMenuItem className="text-red-600">Deletar</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    )
+}
