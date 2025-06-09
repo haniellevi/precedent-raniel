@@ -1,139 +1,127 @@
-
+// components/dna-form.tsx
 'use client';
 
-import { useState, useTransition } from 'react';
-import { toast } from "sonner";
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useState } from 'react';
+import { DnaProfile, updateDnaProfile } from '@/lib/mockApi';
 import { Button } from '@/components/ui/button';
-import { Upload, Youtube, User } from 'lucide-react';
-import { updateDnaProfile, type DnaProfile } from '@/lib/mockApi';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { UploadCloud, Youtube, Loader2, CheckCircle } from 'lucide-react';
 
 interface DnaFormProps {
   initialProfile: DnaProfile;
 }
 
 export default function DnaForm({ initialProfile }: DnaFormProps) {
-  const [isPending, startTransition] = useTransition();
-  const [formData, setFormData] = useState({
-    youtubeLink: '',
-    personalDescription: initialProfile.customAttributes?.style || '',
-    tone: initialProfile.customAttributes?.tone || '',
-    vocabulary: initialProfile.customAttributes?.vocabulary?.join(', ') || ''
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [youtubeLink, setYoutubeLink] = useState('');
+  const [personalDescription, setPersonalDescription] = useState(
+    initialProfile.customAttributes?.style || ''
+  );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsLoading(true);
+    setIsSuccess(false);
 
-    startTransition(async () => {
-      try {
-        const result = await updateDnaProfile(formData);
-        
-        if (result.success) {
-          toast.success("DNA atualizado com sucesso!", {
-            description: "Suas preferências foram guardadas.",
-          });
-        }
-      } catch (error) {
-        toast.error("Ocorreu um erro", {
-          description: "Não foi possível atualizar o DNA.",
-        });
-      }
-    });
-  };
+    const formData = {
+      youtubeLink,
+      personalDescription,
+      // Em uma aplicação real, você lidaria com o upload do arquivo aqui
+    };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    await updateDnaProfile(formData);
+
+    setIsLoading(false);
+    setIsSuccess(true);
+
+    // Esconde a mensagem de sucesso após alguns segundos
+    setTimeout(() => setIsSuccess(false), 4000);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Seção de Upload de Arquivo */}
       <div className="space-y-2">
-        <Label htmlFor="youtube-link" className="flex items-center gap-2">
-          <Youtube className="h-5 w-5" />
-          Link de Vídeo do YouTube
+        <Label htmlFor="sermon-file" className="text-base font-semibold">
+          Transcrições de Sermões
         </Label>
         <p className="text-sm text-muted-foreground">
-          Cole o URL de um sermão seu no YouTube para analisarmos a sua fala.
+          Envie um arquivo (.pdf, .docx, .txt) com seus sermões anteriores.
         </p>
-        <Input 
-          id="youtube-link" 
-          type="url" 
-          placeholder="https://www.youtube.com/watch?v=..." 
-          disabled={isPending}
-          value={formData.youtubeLink}
-          onChange={(e) => handleInputChange('youtubeLink', e.target.value)}
-        />
+        <div className="flex items-center justify-center w-full">
+          <label
+            htmlFor="sermon-file-upload"
+            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted/80"
+          >
+            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              <UploadCloud className="w-8 h-8 mb-4 text-muted-foreground" />
+              <p className="mb-2 text-sm text-muted-foreground">
+                <span className="font-semibold">Clique para enviar</span> ou arraste e solte
+              </p>
+            </div>
+            <input id="sermon-file-upload" type="file" className="hidden" />
+          </label>
+        </div>
       </div>
 
+      {/* Seção de Link do YouTube */}
       <div className="space-y-2">
-        <Label htmlFor="personal-description" className="flex items-center gap-2">
-          <User className="h-5 w-5" />
-          Como se vê como pregador?
+        <Label htmlFor="youtube-link" className="text-base font-semibold">Link do YouTube</Label>
+        <p className="text-sm text-muted-foreground">
+          Cole um link de uma pregação sua no YouTube para análise de vídeo e áudio.
+        </p>
+        <div className="relative">
+          <Youtube className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            id="youtube-link"
+            placeholder="https://www.youtube.com/watch?v=..."
+            value={youtubeLink}
+            onChange={(e) => setYoutubeLink(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+      {/* Seção de Descrição Pessoal */}
+      <div className="space-y-2">
+        <Label htmlFor="personal-description" className="text-base font-semibold">
+          Sua Voz como Pregador
         </Label>
         <p className="text-sm text-muted-foreground">
-          Descreva o seu estilo, tom e os temas que mais gosta de abordar.
+          Descreva em poucas palavras suas características, seu estilo e o que você mais valoriza em uma mensagem.
         </p>
-        <Textarea 
-          id="personal-description" 
-          placeholder="Ex: Sou um pregador expositivo..." 
-          disabled={isPending} 
-          rows={5} 
-          required
-          value={formData.personalDescription}
-          onChange={(e) => handleInputChange('personalDescription', e.target.value)}
+        <Textarea
+          id="personal-description"
+          placeholder="Ex: Sou um pregador que busca ser prático e inspirador, usando ilustrações do dia a dia para conectar a Bíblia com a vida das pessoas..."
+          value={personalDescription}
+          onChange={(e) => setPersonalDescription(e.target.value)}
+          rows={5}
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="tone" className="flex items-center gap-2">
-          Tom da Pregação
-        </Label>
-        <Input 
-          id="tone" 
-          placeholder="Ex: Inspirador e Encorajador" 
-          disabled={isPending}
-          value={formData.tone}
-          onChange={(e) => handleInputChange('tone', e.target.value)}
-        />
+      {/* Botão de Submissão */}
+      <div className="flex items-center gap-4">
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Analisando...
+            </>
+          ) : (
+            'Analisar e Salvar DNA'
+          )}
+        </Button>
+        {isSuccess && (
+          <div className="flex items-center text-green-600">
+            <CheckCircle className="mr-2 h-4 w-4" />
+            <span>DNA atualizado com sucesso!</span>
+          </div>
+        )}
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="vocabulary" className="flex items-center gap-2">
-          Vocabulário Preferido
-        </Label>
-        <p className="text-sm text-muted-foreground">
-          Palavras ou expressões que usa frequentemente (separadas por vírgula).
-        </p>
-        <Input 
-          id="vocabulary" 
-          placeholder="Ex: graça, redenção, propósito, comunidade" 
-          disabled={isPending}
-          value={formData.vocabulary}
-          onChange={(e) => handleInputChange('vocabulary', e.target.value)}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="file-upload" className="flex items-center gap-2">
-          <Upload className="h-5 w-5" />
-          Ficheiro de Referência (Opcional)
-        </Label>
-        <p className="text-sm text-muted-foreground">
-          Envie um ficheiro (.pdf, .docx, .txt) com sermões ou anotações suas.
-        </p>
-        <Input 
-          id="file-upload" 
-          type="file" 
-          disabled={isPending} 
-          accept=".pdf,.doc,.docx,.txt,.odt" 
-        />
-      </div>
-
-      <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
-        {isPending ? 'A processar...' : 'Guardar DNA'}
-      </Button>
     </form>
   );
 }
+
