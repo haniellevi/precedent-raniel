@@ -1,0 +1,215 @@
+Olá! Por favor, execute as seguintes tarefas para uma "Sprint de Qualidade e UX", corrigindo o layout e melhorando a interface do usuário.
+
+Tarefa 1: Corrigir o Layout de Cabeçalho Duplicado
+Ação: Crie um componente de cabeçalho centralizado e atualize o layout do dashboard para usá-lo, eliminando a duplicação.
+
+1. Crie o arquivo: components/layout/main-header.tsx
+
+// components/layout/main-header.tsx
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { UserButton } from '@clerk/nextjs';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+
+const navItems = [
+  { name: 'Gerar Sermão', href: '/gerar' },
+  { name: 'Histórico', href: '/historico' },
+  { name: 'Meu DNA', href: '/dna' },
+];
+
+export default function MainHeader() {
+  const pathname = usePathname();
+
+  return (
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
+        <div className="mr-4 hidden md:flex">
+          <Link href="/gerar" className="mr-6 flex items-center space-x-2">
+            <Image src="/logo.png" alt="SermonAI Logo" width={24} height={24} />
+            <span className="font-bold">SermonAI</span>
+          </Link>
+          <nav className="flex items-center space-x-6 text-sm font-medium">
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  "transition-colors hover:text-foreground/80",
+                  pathname === item.href ? "text-foreground" : "text-muted-foreground"
+                )}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          <UserButton afterSignOutUrl="/" />
+        </div>
+      </div>
+    </header>
+  );
+}
+
+2. Substitua o conteúdo do arquivo: app/(dashboard)/layout.tsx
+
+// app/(dashboard)/layout.tsx
+import { ReactNode } from 'react';
+import Footer from '@/components/layout/footer';
+import MainHeader from '@/components/layout/main-header';
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <div className="relative flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
+      <MainHeader />
+      <main className="flex-1">
+        <div className="container py-8">
+            {children}
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+Tarefa 2: Melhorar o Visual e Contraste dos Cards
+Ação: Edite o arquivo components/sermon-generation-form.tsx para adicionar um melhor estilo ao card principal.
+
+Edite o arquivo: components/sermon-generation-form.tsx
+
+No componente <Card>, adicione as classes shadow-lg para dar profundidade.
+
+// components/sermon-generation-form.tsx
+
+// ... (imports e início do componente)
+
+  return (
+    // ADICIONE A CLASSE 'shadow-lg' AQUI
+    <Card className="shadow-lg"> 
+      <CardHeader>
+        {/* ... (conteúdo do header) */}
+      </CardHeader>
+      <CardContent>
+        {/* ... (conteúdo do formulário) */}
+      </CardContent>
+    </Card>
+  );
+}
+
+Tarefa 3: Melhorar a UX do Formulário com Menus de Seleção
+Ação: Refatore o arquivo components/sermon-generation-form.tsx para substituir o campo de texto "Propósito Principal" por um menu de seleção.
+
+Substitua o conteúdo completo do arquivo: components/sermon-generation-form.tsx
+
+// components/sermon-generation-form.tsx
+'use client';
+
+import { useState } from 'react';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Textarea } from './ui/textarea';
+import { Loader2 } from 'lucide-react';
+import { Sermon } from '@/lib/mockApi';
+
+interface SermonGenerationFormProps {
+  onSermonGenerated: (sermon: Sermon) => void;
+}
+
+export default function SermonGenerationForm({ onSermonGenerated }: SermonGenerationFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+
+    const formData = new FormData(event.currentTarget);
+    const params = Object.fromEntries(formData.entries());
+    
+    // Na próxima fase, esta chamada será para a API
+    const response = await fetch('/api/sermons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+    });
+    const sermon = await response.json();
+    
+    onSermonGenerated(sermon);
+    setIsLoading(false);
+  };
+
+  return (
+    <Card className="shadow-lg">
+      <CardHeader>
+        <CardTitle>Gerar Novo Sermão</CardTitle>
+        <CardDescription>
+          Preencha os campos abaixo para criar um sermão personalizado com base no seu DNA.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="theme">Tema Central</Label>
+            <Input id="theme" name="theme" placeholder="Ex: A Graça de Deus" required />
+          </div>
+          
+          {/* ===== INÍCIO DA ALTERAÇÃO ===== */}
+          <div className="space-y-2">
+            <Label htmlFor="purpose">Propósito Principal</Label>
+            <Select name="purpose" defaultValue="Inspirar">
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um propósito" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Inspirar">Inspirar</SelectItem>
+                <SelectItem value="Ensinar">Ensinar</SelectItem>
+                <SelectItem value="Confrontar">Confrontar</SelectItem>
+                <SelectItem value="Consolar">Consolar</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {/* ===== FIM DA ALTERAÇÃO ===== */}
+
+          <div className="space-y-2">
+            <Label htmlFor="audience">Público-Alvo</Label>
+            <Input id="audience" name="audience" placeholder="Ex: Jovens, Famílias, Igreja em geral" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="duration">Duração Aproximada (min)</Label>
+            <Input id="duration" name="duration" type="number" defaultValue={25} />
+          </div>
+          <div className="md:col-span-2 space-y-2">
+            <Label htmlFor="custom-prompt">Seu Próprio Prompt / Texto Base</Label>
+            <Textarea
+              id="custom-prompt"
+              name="custom-prompt"
+              placeholder="Opcional: Insira aqui um esboço, um versículo chave ou um resumo que você queira usar como base..."
+              rows={4}
+            />
+          </div>
+          <div className="md:col-span-2 flex justify-end">
+            <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Gerando com IA...
+                </>
+              ) : (
+                'Gerar Sermão'
+              )}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
