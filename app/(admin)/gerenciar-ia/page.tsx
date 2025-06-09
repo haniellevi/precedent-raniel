@@ -1,9 +1,16 @@
 
-import { getAgentPrompts } from "@/lib/mockApi";
 import PromptEditorForm from "@/components/admin/prompt-editor-form";
+import { AgentPrompt } from "@/lib/mockApi";
+
+async function getPromptsData(): Promise<AgentPrompt[]> {
+    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/admin/prompts`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch prompts');
+    return res.json();
+}
 
 export default async function ManageAiPage() {
-    const prompts = await getAgentPrompts();
+    const prompts = await getPromptsData();
     
     return (
         <div className="space-y-8">

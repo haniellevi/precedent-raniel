@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AgentPrompt, updateAgentPrompt } from '@/lib/mockApi';
+import { AgentPrompt } from '@/lib/mockApi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -20,8 +20,15 @@ export default function PromptEditorForm({ promptData }: PromptEditorFormProps) 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
-    await updateAgentPrompt(promptData.id, prompt);
+    
+    await fetch('/api/admin/prompts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: promptData.id, prompt: prompt }),
+    });
+
     setIsLoading(false);
+    // Poderíamos adicionar uma notificação de sucesso aqui (toast)
   };
 
   return (
