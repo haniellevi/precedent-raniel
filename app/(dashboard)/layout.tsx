@@ -1,16 +1,21 @@
 
 // app/(dashboard)/layout.tsx
 import { ReactNode } from 'react';
+import { notFound } from 'next/navigation';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
-import Footer from '@/components/layout/footer';
+import Footer from '@/components/layout/footer'; // 1. Importe o novo componente
 
 export default async function DashboardLayout({
   children,
 }: {
   children: ReactNode;
 }) {
+
+  // A lógica de autenticação do Clerk já deve estar aqui
+  // ...
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -18,7 +23,7 @@ export default async function DashboardLayout({
           <div className="flex gap-6 md:gap-10">
             <Link href="/" className="flex items-center space-x-2">
               <Image
-                src="/logo.png"
+                src="/logo.png" // Verifique o caminho do seu logo
                 alt="SermonAI Logo"
                 width={24}
                 height={24}
@@ -35,6 +40,7 @@ export default async function DashboardLayout({
               >
                 Meu DNA
               </Link>
+              {/* Adicione outros links aqui no futuro */}
             </nav>
             <div className="flex items-center space-x-4">
                <UserButton afterSignOutUrl="/" />
@@ -43,10 +49,12 @@ export default async function DashboardLayout({
         </div>
       </header>
       
+      {/* Conteúdo principal da página */}
       <main className="container flex-1 items-start py-8">
         {children}
       </main>
 
+      {/* 2. Adicione o componente Footer aqui */}
       <Footer />
     </div>
   );
