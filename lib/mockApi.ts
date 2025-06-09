@@ -1,3 +1,4 @@
+
 // lib/mockApi.ts - ATUALIZADO PARA EXPORTAR APENAS DADOS
 
 // --- Interfaces ---
@@ -168,47 +169,3 @@ export const mockAgentPromptsData: AgentPrompt[] = [
     updatedAt: '2025-06-05T15:30:00Z', 
   } 
 ];
-
-export async function fetcher<JSON = any>(
-  input: RequestInfo,
-  init?: RequestInit,
-): Promise<JSON> {
-  const res = await fetch(input, init);
-
-  if (!res.ok) {
-    const json = await res.json();
-    if (json.error) {
-      const error = new Error(json.error) as Error & {
-        status: number;
-      };
-      error.status = res.status;
-      throw error;
-    } else {
-      throw new Error("An unexpected error occurred");
-    }
-  }
-
-  return res.json();
-}
-
-// Função para atualizar perfil DNA
-export async function updateDnaProfile(profile: any) {
-  // Simulação de atualização
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return { success: true, profile };
-}
-
-// Função para gerar sermão
-export async function generateSermon(params: any): Promise<Sermon> {
-  // Simulação de geração de sermão
-  await new Promise(resolve => setTimeout(resolve, 2000));
-
-  return {
-    id: `sermon-${Date.now()}`,
-    title: `Sermão sobre ${params.theme}`,
-    content: `# ${params.theme}\n\n## Introdução\nEste é um sermão sobre ${params.theme} com propósito de ${params.purpose}.\n\n## Desenvolvimento\nConteúdo principal do sermão...\n\n## Conclusão\nConclusão inspiradora.`,
-    enrichmentSuggestions: '* Ilustração: História bíblica relacionada\n* Dinâmica: Momento de reflexão\n* Aplicação prática: Desafio para a semana',
-    parameters: params,
-    createdAt: new Date().toISOString(),
-  };
-}
