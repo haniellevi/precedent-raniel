@@ -30,75 +30,50 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Como Funciona
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Em três passos simples, personalize a IA para criar sermões que soam como você.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <Card className="text-center hover:shadow-lg transition-shadow">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <Card className="text-center">
             <CardHeader>
-              <div className="mx-auto w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Mic className="h-6 w-6 text-blue-600" />
-              </div>
-              <CardTitle>1. Defina o seu DNA</CardTitle>
-            </CardHeader>
-            <CardContent>
+              <Mic className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <CardTitle>DNA Personalizado</CardTitle>
               <CardDescription>
-                Forneça exemplos da sua pregação através de vídeos, textos ou 
-                descrições do seu estilo único.
+                Configure o seu perfil de pregação único com base no seu estilo e teologia.
               </CardDescription>
-            </CardContent>
+            </CardHeader>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-shadow">
+          <Card className="text-center">
             <CardHeader>
-              <div className="mx-auto w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="h-6 w-6 text-green-600" />
-              </div>
-              <CardTitle>2. IA Aprende</CardTitle>
-            </CardHeader>
-            <CardContent>
+              <FileText className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <CardTitle>Geração Inteligente</CardTitle>
               <CardDescription>
-                A nossa IA analisa o seu conteúdo e aprende os padrões únicos 
-                da sua pregação e teologia.
+                IA avançada que gera sermões alinhados com a sua voz e mensagem.
               </CardDescription>
-            </CardContent>
+            </CardHeader>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-shadow">
+          <Card className="text-center">
             <CardHeader>
-              <div className="mx-auto w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <FileText className="h-6 w-6 text-purple-600" />
-              </div>
-              <CardTitle>3. Gere Sermões</CardTitle>
-            </CardHeader>
-            <CardContent>
+              <Zap className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <CardTitle>Resultados Rápidos</CardTitle>
               <CardDescription>
-                Receba sermões personalizados que mantêm a sua voz, estilo e 
-                abordagem teológica únicos.
+                Sermões completos em minutos, prontos para impactar vidas.
               </CardDescription>
-            </CardContent>
+            </CardHeader>
           </Card>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-blue-600 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
+      <section className="container mx-auto px-4 py-16 text-center">
+        <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl font-bold mb-4">
-            Pronto para Começar?
+            Pronto para Transformar a Sua Pregação?
           </h2>
-          <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
-            Configure o seu DNA de pregador em poucos minutos e comece a criar 
-            sermões personalizados hoje mesmo.
+          <p className="text-xl text-gray-600 mb-8">
+            Junte-se a centenas de pregadores que já estão usando IA para criar sermões impactantes.
           </p>
-          <Button asChild size="lg" variant="secondary">
-            <Link href="/dna">Configurar o Meu DNA</Link>
+          <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
+            <Link href="/sign-up">Comece Gratuitamente</Link>
           </Button>
         </div>
       </section>

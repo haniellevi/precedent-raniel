@@ -10,21 +10,14 @@ export default function Header() {
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Image
-              src="/logo.png"
-              alt="SermonAI Logo"
-              width={24}
-              height={24}
-              className="h-6 w-6"
-            />
+          <Link href="/gerar" className="mr-6 flex items-center space-x-2">
+            <Image src="/logo.png" alt="SermonAI Logo" width={24} height={24} />
             <span className="font-bold">SermonAI</span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <MainNav />
           </nav>
         </div>
-        
         <div className="flex flex-1 items-center justify-end space-x-4">
           <SignedIn>
             <UserButton afterSignOutUrl="/" />
